@@ -31,6 +31,7 @@ public class Finding_Range {
         right = arr.length-1;
 
         // find last occurance
+        
 
         while (left<=right) {
             int mid= left+(right - left)/2;
