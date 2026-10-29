@@ -1,0 +1,3802 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BST & Tree Master Vault — Final Perfected Edition</title>
+  <style>
+    :root {
+      --bg-main: #0f172a;
+      --bg-card: #1e293b;
+      --bg-sidebar: #0b1120;
+      --bg-code: #090d16;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --accent: #38bdf8;
+      --border: #334155;
+      --easy: #22c55e;
+      --medium: #f59e0b;
+      --hard: #ef4444;
+      --memory-bg: #1e1b4b;
+      --memory-border: #6366f1;
+
+      /* VS Code Dark Plus Accurate Syntax Colors */
+      --syntax-keyword: #c586c0;
+      --syntax-class: #4ec9b0;
+      --syntax-function: #dcdcaa;
+      --syntax-comment: #6a9955;
+      --syntax-string: #ce9178;
+      --syntax-number: #b5cea8;
+      --syntax-variable: #9cdcfe;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      display: flex;
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background: rgba(148, 163, 184, 0.15);
+      padding: 1px 6px;
+      border-radius: 4px;
+      font-size: 0.9em;
+      color: #e2e8f0;
+    }
+    pre code { background: transparent; padding: 0; font-size: inherit; color: inherit; }
+
+    .sidebar {
+      width: 320px;
+      background-color: var(--bg-sidebar);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 0; bottom: 0; left: 0;
+      overflow-y: auto;
+      z-index: 100;
+    }
+
+    .brand {
+      padding: 18px 20px;
+      border-bottom: 1px solid var(--border);
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .verified-pill {
+      font-size: 0.72rem;
+      background: rgba(34, 197, 94, 0.2);
+      color: #4ade80;
+      padding: 3px 8px;
+      border-radius: 99px;
+      border: 1px solid #22c55e;
+    }
+
+    .nav-top {
+      padding: 12px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .nav-btn {
+      background: transparent;
+      color: var(--text-main);
+      border: 1px solid transparent;
+      padding: 10px 14px;
+      text-align: left;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.92rem;
+      font-weight: 600;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .nav-btn:hover { background-color: var(--bg-card); border-color: var(--border); }
+    .nav-btn.active { background-color: rgba(56, 189, 248, 0.15); color: var(--accent); border-color: var(--accent); }
+
+    .sidebar-search { padding: 12px; border-bottom: 1px solid var(--border); }
+    .sidebar-search input {
+      width: 100%;
+      padding: 9px 12px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background-color: var(--bg-card);
+      color: var(--text-main);
+      font-size: 0.9rem;
+    }
+
+    .sidebar-list { padding: 10px; display: flex; flex-direction: column; gap: 4px; flex: 1; }
+    .q-item {
+      padding: 8px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.86rem;
+      color: var(--text-muted);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.15s;
+    }
+    .q-item:hover { background-color: var(--bg-card); color: var(--text-main); }
+    .q-item.active { background-color: var(--bg-card); color: var(--accent); font-weight: 600; border-left: 3px solid var(--accent); }
+
+    .badge {
+      font-size: 0.68rem;
+      padding: 2px 7px;
+      border-radius: 99px;
+      font-weight: 700;
+      text-transform: uppercase;
+      flex-shrink: 0;
+    }
+    .badge.Easy { background: rgba(34, 197, 94, 0.18); color: var(--easy); }
+    .badge.Medium { background: rgba(245, 158, 11, 0.18); color: var(--medium); }
+    .badge.Hard { background: rgba(239, 68, 68, 0.18); color: var(--hard); }
+
+    .main-content {
+      margin-left: 320px;
+      flex: 1;
+      padding: 32px 44px;
+      max-width: 1150px;
+      min-width: 0;
+    }
+
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 28px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border);
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .lang-switch-global {
+      display: flex;
+      gap: 8px;
+      background: var(--bg-card);
+      padding: 5px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+
+    .lang-btn {
+      background: transparent;
+      color: var(--text-muted);
+      border: none;
+      padding: 6px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.88rem;
+      transition: all 0.2s;
+    }
+    .lang-btn.active { background: var(--accent); color: #0f172a; }
+
+    .hero-card {
+      background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 28px;
+      margin-bottom: 28px;
+    }
+    .hero-card h1 { font-size: 1.8rem; margin-bottom: 10px; color: var(--accent); }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 18px;
+      margin-bottom: 28px;
+    }
+
+    .rule-card {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px;
+    }
+    .rule-card h3 { color: var(--accent); margin-bottom: 10px; font-size: 1.08rem; }
+
+    .cheat-table {
+      width: 100%;
+      border-collapse: collapse;
+      background-color: var(--bg-card);
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 32px;
+      border: 1px solid var(--border);
+    }
+    .cheat-table th, .cheat-table td {
+      padding: 13px 16px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.92rem;
+      vertical-align: top;
+    }
+    .cheat-table th { background-color: #0b1120; color: var(--accent); font-weight: 700; }
+    .table-wrap { overflow-x: auto; }
+
+    .q-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 16px;
+    }
+
+    .q-card {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 18px;
+      cursor: pointer;
+      transition: transform 0.15s, border-color 0.15s;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .q-card:hover { transform: translateY(-3px); border-color: var(--accent); }
+    .q-card-title { font-size: 1.04rem; font-weight: 600; color: var(--text-main); }
+    .q-card-pattern { font-size: 0.83rem; color: var(--text-muted); }
+
+    .problem-header { margin-bottom: 24px; }
+    .problem-title-row { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-bottom: 10px; }
+    .problem-title-row h1 { font-size: 1.7rem; color: var(--text-main); }
+    .meta-pills { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 8px; }
+    .pill { background-color: var(--bg-card); border: 1px solid var(--border); padding: 4px 12px; border-radius: 6px; font-size: 0.82rem; color: var(--text-muted); }
+    .pill.premium { border-color: #f59e0b; color: #fbbf24; }
+
+    .section-box {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 22px;
+      margin-bottom: 22px;
+    }
+    .section-box h3 { color: var(--accent); margin-bottom: 10px; font-size: 1.12rem; }
+    .section-box h4 { color: #cbd5e1; margin: 14px 0 6px; font-size: 0.98rem; }
+    .section-box p { margin-bottom: 8px; }
+
+    .example-box {
+      background-color: rgba(9, 13, 22, 0.7);
+      border-left: 4px solid var(--accent);
+      border-radius: 6px;
+      padding: 10px 14px;
+      margin: 8px 0 12px;
+      font-family: 'Consolas', 'Courier New', monospace;
+      font-size: 0.88rem;
+      white-space: pre-wrap;
+      color: #e2e8f0;
+    }
+    .example-box .lbl { color: var(--accent); font-weight: 700; }
+    .example-box .explain { color: var(--text-muted); font-family: 'Segoe UI', system-ui, sans-serif; }
+
+    .constraints { margin-left: 22px; color: var(--text-muted); font-size: 0.92rem; }
+
+    .hinglish-box {
+      background-color: rgba(34, 197, 94, 0.07);
+      border: 1px solid rgba(34, 197, 94, 0.45);
+      border-radius: 10px;
+      padding: 18px 22px;
+      margin-bottom: 22px;
+    }
+    .hinglish-box h3 { color: #4ade80; margin-bottom: 8px; font-size: 1.05rem; }
+
+    .pitfall-box {
+      background-color: rgba(239, 68, 68, 0.07);
+      border: 1px solid rgba(239, 68, 68, 0.45);
+      border-radius: 10px;
+      padding: 18px 22px;
+      margin-bottom: 22px;
+    }
+    .pitfall-box h3 { color: #f87171; margin-bottom: 8px; font-size: 1.05rem; }
+    .pitfall-box ul { margin-left: 22px; }
+    .pitfall-box li { margin-bottom: 4px; }
+
+    .memory-box {
+      background-color: var(--memory-bg);
+      border: 2px solid var(--memory-border);
+      border-radius: 10px;
+      padding: 22px;
+      margin-bottom: 22px;
+    }
+    .memory-box h3 { color: #a5b4fc; margin-bottom: 12px; font-size: 1.12rem; }
+
+    .flow-diagram {
+      background-color: rgba(9, 13, 22, 0.75);
+      padding: 14px 18px;
+      border-radius: 8px;
+      font-family: 'Consolas', 'Courier New', monospace;
+      color: #e0e7ff;
+      font-size: 0.9rem;
+      overflow-x: auto;
+      white-space: pre-wrap;
+      margin-bottom: 12px;
+      border-left: 4px solid #818cf8;
+    }
+
+    .code-container {
+      background-color: var(--bg-code);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 28px;
+    }
+
+    .code-header {
+      background-color: #131c2e;
+      padding: 10px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .copy-btn {
+      background-color: var(--bg-card);
+      color: var(--text-main);
+      border: 1px solid var(--border);
+      padding: 5px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.82rem;
+      font-weight: 600;
+    }
+    .copy-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+    pre {
+      padding: 20px;
+      overflow-x: auto;
+      font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+      font-size: 0.91rem;
+      line-height: 1.6;
+      color: #d4d4d4;
+    }
+
+    /* VS Code Dark Plus Syntax Highlighting Classes */
+    .token.keyword { color: var(--syntax-keyword); font-weight: 600; }
+    .token.class-name { color: var(--syntax-class); }
+    .token.function { color: var(--syntax-function); }
+    .token.comment { color: var(--syntax-comment); font-style: italic; }
+    .token.string { color: var(--syntax-string); }
+    .token.number { color: var(--syntax-number); }
+
+    .nav-footer {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 30px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
+    }
+
+    .btn-secondary {
+      background-color: var(--bg-card);
+      color: var(--text-main);
+      border: 1px solid var(--border);
+      padding: 10px 18px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+
+    .filter-row { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+
+    .toc { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 22px; }
+    .toc a {
+      font-size: 0.82rem; color: var(--accent); text-decoration: none;
+      border: 1px solid var(--border); background: var(--bg-card);
+      padding: 4px 10px; border-radius: 99px; cursor: pointer;
+    }
+    .toc a:hover { border-color: var(--accent); }
+
+    @media (max-width: 900px) {
+      .sidebar { position: static; width: 100%; height: auto; border-right: none; border-bottom: 1px solid var(--border); }
+      body { flex-direction: column; }
+      .main-content { margin-left: 0; padding: 20px; }
+    }
+  </style>
+</head>
+<body>
+
+  <aside class="sidebar">
+    <div class="brand">
+      <span>🌳 BST Master Vault</span>
+      <span class="verified-pill">✓ Perfected</span>
+    </div>
+    <div class="nav-top">
+      <button id="btn-home" class="nav-btn active" onclick="showHome()">
+        <span>🏠 Home: BST Intuition & Templates</span>
+      </button>
+      <button id="btn-all" class="nav-btn" onclick="showAllQuestions()">
+        <span>📚 All 20 Questions Directory</span>
+        <span class="badge Easy">20</span>
+      </button>
+    </div>
+    <div class="sidebar-search">
+      <input type="text" id="searchInput" placeholder="🔍 Search question or pattern..." oninput="filterSidebar()" />
+    </div>
+    <div class="sidebar-list" id="sidebarList"></div>
+  </aside>
+
+  <main class="main-content">
+    <div class="top-bar">
+      <div id="breadcrumb" style="color: var(--text-muted); font-size: 0.92rem;">
+        Home / Core Intuition & Templates
+      </div>
+      <div class="lang-switch-global">
+        <button id="global-java" class="lang-btn active" onclick="setLanguage('java')">☕ Java</button>
+        <button id="global-python" class="lang-btn" onclick="setLanguage('python')">🐍 Python</button>
+      </div>
+    </div>
+
+    <div id="viewContainer"></div>
+  </main>
+
+  <script>
+    let currentLang = 'java';
+    let currentView = 'home';
+    let currentFilter = 'All';
+
+    function escapeHtml(str) {
+      return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+
+    // ==========================================================
+    // SYNTAX HIGHLIGHTER (single-pass tokenizer)
+    // Comments (full-line AND trailing), strings, numbers, keywords,
+    // class names aur function names sab sahi se color hote hain.
+    // ==========================================================
+    const JAVA_KEYWORDS = new Set([
+      'class','public','private','protected','static','final','void','int','long','double','boolean','char',
+      'new','return','if','else','while','for','null','true','false','this','break','continue','import','package','extends','implements'
+    ]);
+    const PY_KEYWORDS = new Set([
+      'class','def','return','if','else','elif','while','for','in','not','and','or','is','None','True','False',
+      'nonlocal','global','import','from','as','self','pass','break','continue','lambda'
+    ]);
+    const PY_TYPES = new Set(['int','bool','float','str','list','dict','set','tuple']);
+
+    const JAVA_TOKEN_RE = /(\/\/[^\n]*)|("(?:[^"\\\n]|\\.)*")|('(?:[^'\\\n]|\\.)*')|(\b\d+(?:\.\d+)?\b)|([A-Za-z_]\w*)/g;
+    const PY_TOKEN_RE   = /(#[^\n]*)|("(?:[^"\\\n]|\\.)*")|('(?:[^'\\\n]|\\.)*')|(\b\d+(?:\.\d+)?\b)|([A-Za-z_]\w*)/g;
+
+    function highlightCode(code, lang) {
+      const isJava = lang === 'java';
+      const re = new RegExp((isJava ? JAVA_TOKEN_RE : PY_TOKEN_RE).source, 'g');
+      const keywords = isJava ? JAVA_KEYWORDS : PY_KEYWORDS;
+      const span = (cls, text) => `<span class="token ${cls}">${escapeHtml(text)}</span>`;
+
+      let out = '';
+      let last = 0;
+      let m;
+      while ((m = re.exec(code)) !== null) {
+        out += escapeHtml(code.slice(last, m.index));
+        const text = m[0];
+        if (m[1]) out += span('comment', text);
+        else if (m[2] || m[3]) out += span('string', text);
+        else if (m[4]) out += span('number', text);
+        else {
+          const nextChar = code[re.lastIndex];
+          if (keywords.has(text)) out += span('keyword', text);
+          else if (!isJava && PY_TYPES.has(text)) out += span('class-name', text);
+          else if (/^[A-Z]\w*[a-z]\w*$/.test(text)) out += span('class-name', text); // TreeNode, List, Solution...
+          else if (nextChar === '(') out += span('function', text);
+          else out += escapeHtml(text);
+        }
+        last = re.lastIndex;
+      }
+      out += escapeHtml(code.slice(last));
+      return out;
+    }
+
+    // ==========================================================
+    // HOME PAGE: MUST-KNOW STARTER TEMPLATES (Java + Python)
+    // ==========================================================
+    const templates = [
+      {
+        title: "1. TreeNode + Tree Builder (local testing ke liye)",
+        desc: "Har tree problem <code>TreeNode</code> se shuru hoti hai. <code>buildTree</code> level-order array (LeetCode wala format, <code>null</code> = khali jagah) ko tree me badal deta hai, taaki tum apne laptop par code test kar sako.",
+        java: `import java.util.*;
+
+// ==========================================================
+// TreeNode — har tree problem ka building block
+// ==========================================================
+class TreeNode {
+    int val;          // node ki value (BST me ise 'key' bhi kehte hain)
+    TreeNode left;    // left child  -> is subtree ki SAARI values chhoti (< val)
+    TreeNode right;   // right child -> is subtree ki SAARI values badi (> val)
+
+    TreeNode() {}
+    TreeNode(int val) { this.val = val; }
+    TreeNode(int val, TreeNode left, TreeNode right) {
+        this.val = val;
+        this.left = left;
+        this.right = right;
+    }
+}
+
+// Local testing helper: level-order array se tree banata hai (BFS se).
+// Example: [5,3,6,2,4,null,7]
+//   root = 5, left = 3, right = 6
+//   3 ke bachche -> (2, 4)      6 ke bachche -> (null, 7)
+public static TreeNode buildTree(Integer[] arr) {
+    if (arr.length == 0 || arr[0] == null) return null;
+    TreeNode root = new TreeNode(arr[0]);
+    Queue<TreeNode> queue = new LinkedList<>();   // BFS queue: jinke bachche abhi jodne baaki hain
+    queue.offer(root);
+    int i = 1;                                    // arr me agla unused index
+    while (!queue.isEmpty() && i < arr.length) {
+        TreeNode node = queue.poll();
+        // Left child
+        if (i < arr.length && arr[i] != null) {
+            node.left = new TreeNode(arr[i]);
+            queue.offer(node.left);
+        }
+        i++;
+        // Right child
+        if (i < arr.length && arr[i] != null) {
+            node.right = new TreeNode(arr[i]);
+            queue.offer(node.right);
+        }
+        i++;
+    }
+    return root;
+}`,
+        python: `from typing import Optional, List
+from collections import deque
+
+# ==========================================================
+# TreeNode — har tree problem ka building block
+# ==========================================================
+class TreeNode:
+    def __init__(self, val=0, left=None, right=None):
+        self.val = val        # node ki value (BST me ise 'key' bhi kehte hain)
+        self.left = left      # left child  -> is subtree ki SAARI values chhoti (< val)
+        self.right = right    # right child -> is subtree ki SAARI values badi (> val)
+
+# Local testing helper: level-order list se tree banata hai (BFS se).
+# Example: [5,3,6,2,4,None,7]
+#   root = 5, left = 3, right = 6
+#   3 ke bachche -> (2, 4)      6 ke bachche -> (None, 7)
+def build_tree(arr: List[Optional[int]]) -> Optional[TreeNode]:
+    if not arr or arr[0] is None:
+        return None
+    root = TreeNode(arr[0])
+    queue = deque([root])      # BFS queue: jinke bachche abhi jodne baaki hain
+    i = 1                      # arr me agla unused index
+    while queue and i < len(arr):
+        node = queue.popleft()
+        # Left child
+        if i < len(arr) and arr[i] is not None:
+            node.left = TreeNode(arr[i])
+            queue.append(node.left)
+        i += 1
+        # Right child
+        if i < len(arr) and arr[i] is not None:
+            node.right = TreeNode(arr[i])
+            queue.append(node.right)
+        i += 1
+    return root`
+      },
+      {
+        title: "2. Search in BST (Recursive + Iterative)",
+        desc: "BST ka sabse basic operation. Har step par aadha tree eliminate hota hai. Balanced tree me <b>O(log N)</b>, skewed (linked-list jaisa) tree me <b>O(N)</b>.",
+        java: `// ----------------------------------------------------------
+// SEARCH — Recursive
+// Time: O(H)   Space: O(H) (recursion call stack)
+// ----------------------------------------------------------
+public TreeNode searchBST(TreeNode root, int target) {
+    // Base: tree khatam (null) ya node mil gaya -> dono me 'root' hi return
+    if (root == null || root.val == target) return root;
+
+    // Target chhota hai -> sirf LEFT me ho sakta hai
+    if (target < root.val) return searchBST(root.left, target);
+
+    // Target bada hai -> sirf RIGHT me ho sakta hai
+    return searchBST(root.right, target);
+}
+
+// ----------------------------------------------------------
+// SEARCH — Iterative (interview me ye zyada pasand kiya jata hai)
+// Time: O(H)   Space: O(1)
+// ----------------------------------------------------------
+public TreeNode searchBSTIter(TreeNode root, int target) {
+    TreeNode curr = root;
+    while (curr != null) {
+        if (target == curr.val) return curr;          // mil gaya
+        curr = (target < curr.val) ? curr.left : curr.right;  // ek side chhod do
+    }
+    return null;                                      // poora path khatam, nahi mila
+}`,
+        python: `# ----------------------------------------------------------
+# SEARCH — Recursive
+# Time: O(H)   Space: O(H) (recursion call stack)
+# ----------------------------------------------------------
+def search_bst(root: Optional[TreeNode], target: int) -> Optional[TreeNode]:
+    # Base: tree khatam (None) ya node mil gaya -> dono me 'root' hi return
+    if not root or root.val == target:
+        return root
+
+    # Target chhota hai -> sirf LEFT me ho sakta hai
+    if target < root.val:
+        return search_bst(root.left, target)
+
+    # Target bada hai -> sirf RIGHT me ho sakta hai
+    return search_bst(root.right, target)
+
+# ----------------------------------------------------------
+# SEARCH — Iterative (interview me ye zyada pasand kiya jata hai)
+# Time: O(H)   Space: O(1)
+# ----------------------------------------------------------
+def search_bst_iter(root: Optional[TreeNode], target: int) -> Optional[TreeNode]:
+    curr = root
+    while curr:
+        if target == curr.val:
+            return curr                                   # mil gaya
+        curr = curr.left if target < curr.val else curr.right  # ek side chhod do
+    return None                                           # poora path khatam, nahi mila`
+      },
+      {
+        title: "3. Insert into BST (Recursive + Iterative)",
+        desc: "Naya node hamesha <b>leaf</b> banke lagta hai. Pehle search ki tarah neeche jao, jahan <code>null</code> mile wahin naya node jod do. Duplicates is template me right side me jate hain.",
+        java: `// ----------------------------------------------------------
+// INSERT — Recursive
+// Time: O(H)   Space: O(H)
+// Trick: har call 'updated subtree ka root' return karti hai,
+//        isliye root.left = insert(root.left, val) likhna zaroori hai.
+// ----------------------------------------------------------
+public TreeNode insertIntoBST(TreeNode root, int val) {
+    // Khali jagah mil gayi -> yahin naya node
+    if (root == null) return new TreeNode(val);
+
+    if (val < root.val) root.left = insertIntoBST(root.left, val);   // left subtree me jao
+    else root.right = insertIntoBST(root.right, val);                // right subtree me jao
+
+    return root;   // current root ko wapas parent se jodne ke liye return
+}
+
+// ----------------------------------------------------------
+// INSERT — Iterative
+// Time: O(H)   Space: O(1)
+// ----------------------------------------------------------
+public TreeNode insertIntoBSTIter(TreeNode root, int val) {
+    TreeNode node = new TreeNode(val);
+    if (root == null) return node;          // empty tree: naya node hi root
+
+    TreeNode curr = root;
+    while (true) {
+        if (val < curr.val) {
+            if (curr.left == null) { curr.left = node; break; }    // khali slot mila
+            curr = curr.left;
+        } else {
+            if (curr.right == null) { curr.right = node; break; }  // khali slot mila
+            curr = curr.right;
+        }
+    }
+    return root;
+}`,
+        python: `# ----------------------------------------------------------
+# INSERT — Recursive
+# Time: O(H)   Space: O(H)
+# Trick: har call 'updated subtree ka root' return karti hai,
+#        isliye root.left = insert(root.left, val) likhna zaroori hai.
+# ----------------------------------------------------------
+def insert_into_bst(root: Optional[TreeNode], val: int) -> Optional[TreeNode]:
+    # Khali jagah mil gayi -> yahin naya node
+    if not root:
+        return TreeNode(val)
+
+    if val < root.val:
+        root.left = insert_into_bst(root.left, val)     # left subtree me jao
+    else:
+        root.right = insert_into_bst(root.right, val)   # right subtree me jao
+
+    return root   # current root ko wapas parent se jodne ke liye return
+
+# ----------------------------------------------------------
+# INSERT — Iterative
+# Time: O(H)   Space: O(1)
+# ----------------------------------------------------------
+def insert_into_bst_iter(root: Optional[TreeNode], val: int) -> Optional[TreeNode]:
+    node = TreeNode(val)
+    if not root:
+        return node              # empty tree: naya node hi root
+
+    curr = root
+    while True:
+        if val < curr.val:
+            if not curr.left:
+                curr.left = node     # khali slot mila
+                break
+            curr = curr.left
+        else:
+            if not curr.right:
+                curr.right = node    # khali slot mila
+                break
+            curr = curr.right
+    return root`
+      },
+      {
+        title: "4. Min / Max / Floor / Ceiling / Successor / Predecessor",
+        desc: "Ye chhote helpers kai problems me kaam aate hain (Delete, Inorder Successor, Closest Value, Two Sum BST...). Sab <b>O(H)</b> time aur <b>O(1)</b> space me chalte hain.",
+        java: `// Sabse chhota: bas LEFT-LEFT-LEFT chalte jao
+public TreeNode findMin(TreeNode node) {
+    while (node.left != null) node = node.left;
+    return node;
+}
+
+// Sabse bada: bas RIGHT-RIGHT-RIGHT chalte jao
+public TreeNode findMax(TreeNode node) {
+    while (node.right != null) node = node.right;
+    return node;
+}
+
+// FLOOR: target se chhota-ya-barabar me sabse BADA value (nahi hai toh null)
+public Integer floor(TreeNode root, int target) {
+    Integer ans = null;
+    while (root != null) {
+        if (root.val == target) return root.val;           // exact match = best floor
+        if (root.val < target) { ans = root.val; root = root.right; } // candidate, aur bada dhoondo
+        else root = root.left;                             // bada hai, left me jao
+    }
+    return ans;
+}
+
+// CEILING: target se bada-ya-barabar me sabse CHHOTA value (nahi hai toh null)
+public Integer ceiling(TreeNode root, int target) {
+    Integer ans = null;
+    while (root != null) {
+        if (root.val == target) return root.val;
+        if (root.val > target) { ans = root.val; root = root.left; }  // candidate, aur chhota dhoondo
+        else root = root.right;
+    }
+    return ans;
+}
+
+// SUCCESSOR: val se STRICTLY bada me sabse chhota node (inorder me next)
+public TreeNode successor(TreeNode root, int val) {
+    TreeNode ans = null;
+    while (root != null) {
+        if (root.val > val) { ans = root; root = root.left; }  // candidate save, aur chhota dhoondo
+        else root = root.right;                                // val ya chhota -> right jao
+    }
+    return ans;
+}
+
+// PREDECESSOR: val se STRICTLY chhota me sabse bada node (inorder me pichhla)
+public TreeNode predecessor(TreeNode root, int val) {
+    TreeNode ans = null;
+    while (root != null) {
+        if (root.val < val) { ans = root; root = root.right; } // candidate save, aur bada dhoondo
+        else root = root.left;
+    }
+    return ans;
+}`,
+        python: `# Sabse chhota: bas LEFT-LEFT-LEFT chalte jao
+def find_min(node: TreeNode) -> TreeNode:
+    while node.left:
+        node = node.left
+    return node
+
+# Sabse bada: bas RIGHT-RIGHT-RIGHT chalte jao
+def find_max(node: TreeNode) -> TreeNode:
+    while node.right:
+        node = node.right
+    return node
+
+# FLOOR: target se chhota-ya-barabar me sabse BADA value (nahi hai toh None)
+def floor(root: Optional[TreeNode], target: int) -> Optional[int]:
+    ans = None
+    while root:
+        if root.val == target:
+            return root.val              # exact match = best floor
+        if root.val < target:
+            ans = root.val               # candidate, aur bada dhoondo
+            root = root.right
+        else:
+            root = root.left             # bada hai, left me jao
+    return ans
+
+# CEILING: target se bada-ya-barabar me sabse CHHOTA value (nahi hai toh None)
+def ceiling(root: Optional[TreeNode], target: int) -> Optional[int]:
+    ans = None
+    while root:
+        if root.val == target:
+            return root.val
+        if root.val > target:
+            ans = root.val               # candidate, aur chhota dhoondo
+            root = root.left
+        else:
+            root = root.right
+    return ans
+
+# SUCCESSOR: val se STRICTLY bada me sabse chhota node (inorder me next)
+def successor(root: Optional[TreeNode], val: int) -> Optional[TreeNode]:
+    ans = None
+    while root:
+        if root.val > val:
+            ans = root                   # candidate save, aur chhota dhoondo
+            root = root.left
+        else:
+            root = root.right            # val ya chhota -> right jao
+    return ans
+
+# PREDECESSOR: val se STRICTLY chhota me sabse bada node (inorder me pichhla)
+def predecessor(root: Optional[TreeNode], val: int) -> Optional[TreeNode]:
+    ans = None
+    while root:
+        if root.val < val:
+            ans = root                   # candidate save, aur bada dhoondo
+            root = root.right
+        else:
+            root = root.left
+    return ans`
+      },
+      {
+        title: "5. Delete Node in BST (3 Cases)",
+        desc: "BST ka sabse tricky operation. Pehle node dhoondho, phir 3 cases: <b>Leaf</b> (seedha hata do), <b>1 child</b> (child ko upar utha do), <b>2 children</b> (right subtree ka minimum = inorder successor, uski value copy karke wo duplicate delete karo).",
+        java: `// ----------------------------------------------------------
+// DELETE — Recursive
+// Time: O(H)   Space: O(H)
+// ----------------------------------------------------------
+public TreeNode deleteNode(TreeNode root, int key) {
+    if (root == null) return null;                 // key tree me hai hi nahi
+
+    if (key < root.val) {
+        root.left = deleteNode(root.left, key);    // left me dhoondo
+    } else if (key > root.val) {
+        root.right = deleteNode(root.right, key);  // right me dhoondo
+    } else {
+        // ---- Node mil gaya (root.val == key) ----
+        // Case 1 (leaf) + Case 2 (sirf ek child): dusri taraf null toh doosra child upar
+        if (root.left == null) return root.right;
+        if (root.right == null) return root.left;
+
+        // Case 3: dono children hain
+        TreeNode successor = findMin(root.right);  // right subtree ka sabse chhota
+        root.val = successor.val;                  // uski value yahan copy
+        root.right = deleteNode(root.right, successor.val); // original successor hatao
+    }
+    return root;
+}
+
+private TreeNode findMin(TreeNode node) {
+    while (node.left != null) node = node.left;
+    return node;
+}`,
+        python: `# ----------------------------------------------------------
+# DELETE — Recursive
+# Time: O(H)   Space: O(H)
+# ----------------------------------------------------------
+def delete_node(root: Optional[TreeNode], key: int) -> Optional[TreeNode]:
+    if not root:
+        return None                                  # key tree me hai hi nahi
+
+    if key < root.val:
+        root.left = delete_node(root.left, key)      # left me dhoondo
+    elif key > root.val:
+        root.right = delete_node(root.right, key)    # right me dhoondo
+    else:
+        # ---- Node mil gaya (root.val == key) ----
+        # Case 1 (leaf) + Case 2 (sirf ek child): dusri taraf None toh doosra child upar
+        if not root.left:
+            return root.right
+        if not root.right:
+            return root.left
+
+        # Case 3: dono children hain
+        successor = root.right
+        while successor.left:                        # right subtree ka sabse chhota
+            successor = successor.left
+        root.val = successor.val                     # uski value yahan copy
+        root.right = delete_node(root.right, successor.val)  # original successor hatao
+    return root`
+      },
+      {
+        title: "6. DFS Traversals — Inorder / Preorder / Postorder (Recursive)",
+        desc: "<b>Inorder</b> (L-Root-R) = BST ka sorted order. <b>Preorder</b> (Root-L-R) = tree copy/serialize/construct. <b>Postorder</b> (L-R-Root) = bottom-up decision (subtree info collect karke root par kaam).",
+        java: `// ----------------------------------------------------------
+// INORDER: Left -> Root -> Right
+// BST me ye hamesha SORTED (ascending) order deta hai!
+// ----------------------------------------------------------
+public void inorder(TreeNode node, List<Integer> out) {
+    if (node == null) return;
+    inorder(node.left, out);     // 1) pehle poora left subtree
+    out.add(node.val);           // 2) phir current node
+    inorder(node.right, out);    // 3) phir poora right subtree
+}
+
+// ----------------------------------------------------------
+// PREORDER: Root -> Left -> Right
+// Root pehle aata hai -> tree ko reconstruct/serialize karne me kaam aata hai
+// ----------------------------------------------------------
+public void preorder(TreeNode node, List<Integer> out) {
+    if (node == null) return;
+    out.add(node.val);           // 1) current node PEHLE
+    preorder(node.left, out);
+    preorder(node.right, out);
+}
+
+// ----------------------------------------------------------
+// POSTORDER: Left -> Right -> Root
+// Root aakhir me -> pehle bachchon se info lo, phir root par decide karo
+// (Largest BST Subtree, Max Path Sum, LCA yahi pattern use karte hain)
+// ----------------------------------------------------------
+public void postorder(TreeNode node, List<Integer> out) {
+    if (node == null) return;
+    postorder(node.left, out);
+    postorder(node.right, out);
+    out.add(node.val);           // current node AAKHIR me
+}`,
+        python: `# ----------------------------------------------------------
+# INORDER: Left -> Root -> Right
+# BST me ye hamesha SORTED (ascending) order deta hai!
+# ----------------------------------------------------------
+def inorder(node: Optional[TreeNode], out: List[int]) -> None:
+    if not node:
+        return
+    inorder(node.left, out)      # 1) pehle poora left subtree
+    out.append(node.val)         # 2) phir current node
+    inorder(node.right, out)     # 3) phir poora right subtree
+
+# ----------------------------------------------------------
+# PREORDER: Root -> Left -> Right
+# Root pehle aata hai -> tree ko reconstruct/serialize karne me kaam aata hai
+# ----------------------------------------------------------
+def preorder(node: Optional[TreeNode], out: List[int]) -> None:
+    if not node:
+        return
+    out.append(node.val)         # 1) current node PEHLE
+    preorder(node.left, out)
+    preorder(node.right, out)
+
+# ----------------------------------------------------------
+# POSTORDER: Left -> Right -> Root
+# Root aakhir me -> pehle bachchon se info lo, phir root par decide karo
+# (Largest BST Subtree, Max Path Sum, LCA yahi pattern use karte hain)
+# ----------------------------------------------------------
+def postorder(node: Optional[TreeNode], out: List[int]) -> None:
+    if not node:
+        return
+    postorder(node.left, out)
+    postorder(node.right, out)
+    out.append(node.val)         # current node AAKHIR me`
+      },
+      {
+        title: "7. Iterative Traversals (Stack) + Kth Smallest",
+        desc: "Recursion ki jagah apna <b>stack</b>. Interview me 'recursion mat use karo' bola jaye ya tree bahut deep ho (stack overflow), tab ye kaam aata hai. Iterative inorder se hi BST Iterator aur Kth Smallest banta hai.",
+        java: `// ----------------------------------------------------------
+// INORDER (iterative) — Time O(N), Space O(H)
+// Idea: jitna ho sake LEFT jao (stack me push), phir pop -> visit -> RIGHT jao
+// ----------------------------------------------------------
+public List<Integer> inorderIter(TreeNode root) {
+    List<Integer> res = new ArrayList<>();
+    Deque<TreeNode> stack = new ArrayDeque<>();
+    TreeNode curr = root;
+    while (curr != null || !stack.isEmpty()) {
+        while (curr != null) {          // left-most tak push karte jao
+            stack.push(curr);
+            curr = curr.left;
+        }
+        curr = stack.pop();             // sabse chhota pending node
+        res.add(curr.val);              // visit
+        curr = curr.right;              // ab uske right subtree ki baari
+    }
+    return res;
+}
+
+// ----------------------------------------------------------
+// PREORDER (iterative)
+// Stack LIFO hai: RIGHT pehle push karo taaki LEFT pehle pop ho
+// ----------------------------------------------------------
+public List<Integer> preorderIter(TreeNode root) {
+    List<Integer> res = new ArrayList<>();
+    if (root == null) return res;
+    Deque<TreeNode> stack = new ArrayDeque<>();
+    stack.push(root);
+    while (!stack.isEmpty()) {
+        TreeNode node = stack.pop();
+        res.add(node.val);                                  // visit root
+        if (node.right != null) stack.push(node.right);    // right pehle push
+        if (node.left != null) stack.push(node.left);      // left baad me push -> pehle pop
+    }
+    return res;
+}
+
+// ----------------------------------------------------------
+// POSTORDER (iterative) — trick: Root-Right-Left nikalo, phir REVERSE
+// ----------------------------------------------------------
+public List<Integer> postorderIter(TreeNode root) {
+    LinkedList<Integer> res = new LinkedList<>();
+    if (root == null) return res;
+    Deque<TreeNode> stack = new ArrayDeque<>();
+    stack.push(root);
+    while (!stack.isEmpty()) {
+        TreeNode node = stack.pop();
+        res.addFirst(node.val);                             // front me daalna = reverse
+        if (node.left != null) stack.push(node.left);      // left pehle push
+        if (node.right != null) stack.push(node.right);    // right baad me -> pehle pop
+    }
+    return res;     // Root-Right-Left ka reverse = Left-Right-Root
+}
+
+// ----------------------------------------------------------
+// KTH SMALLEST (iterative inorder) — k-th pop hi answer
+// Time: O(H + K)   Space: O(H)
+// ----------------------------------------------------------
+public int kthSmallest(TreeNode root, int k) {
+    Deque<TreeNode> stack = new ArrayDeque<>();
+    TreeNode curr = root;
+    while (curr != null || !stack.isEmpty()) {
+        while (curr != null) { stack.push(curr); curr = curr.left; }
+        curr = stack.pop();
+        if (--k == 0) return curr.val;   // k-th visited node mil gaya, turant ruk jao
+        curr = curr.right;
+    }
+    return -1;   // k valid ho toh yahan kabhi nahi pahunchenge
+}`,
+        python: `# ----------------------------------------------------------
+# INORDER (iterative) — Time O(N), Space O(H)
+# Idea: jitna ho sake LEFT jao (stack me push), phir pop -> visit -> RIGHT jao
+# ----------------------------------------------------------
+def inorder_iter(root: Optional[TreeNode]) -> List[int]:
+    res, stack, curr = [], [], root
+    while curr or stack:
+        while curr:                     # left-most tak push karte jao
+            stack.append(curr)
+            curr = curr.left
+        curr = stack.pop()              # sabse chhota pending node
+        res.append(curr.val)            # visit
+        curr = curr.right               # ab uske right subtree ki baari
+    return res
+
+# ----------------------------------------------------------
+# PREORDER (iterative)
+# Stack LIFO hai: RIGHT pehle push karo taaki LEFT pehle pop ho
+# ----------------------------------------------------------
+def preorder_iter(root: Optional[TreeNode]) -> List[int]:
+    if not root:
+        return []
+    res, stack = [], [root]
+    while stack:
+        node = stack.pop()
+        res.append(node.val)                 # visit root
+        if node.right:
+            stack.append(node.right)         # right pehle push
+        if node.left:
+            stack.append(node.left)          # left baad me push -> pehle pop
+    return res
+
+# ----------------------------------------------------------
+# POSTORDER (iterative) — trick: Root-Right-Left nikalo, phir REVERSE
+# ----------------------------------------------------------
+def postorder_iter(root: Optional[TreeNode]) -> List[int]:
+    if not root:
+        return []
+    res, stack = [], [root]
+    while stack:
+        node = stack.pop()
+        res.append(node.val)                 # Root-Right-Left order me bharo
+        if node.left:
+            stack.append(node.left)          # left pehle push
+        if node.right:
+            stack.append(node.right)         # right baad me -> pehle pop
+    return res[::-1]     # reverse karte hi Left-Right-Root mil jata hai
+
+# ----------------------------------------------------------
+# KTH SMALLEST (iterative inorder) — k-th pop hi answer
+# Time: O(H + K)   Space: O(H)
+# ----------------------------------------------------------
+def kth_smallest(root: Optional[TreeNode], k: int) -> int:
+    stack, curr = [], root
+    while curr or stack:
+        while curr:
+            stack.append(curr)
+            curr = curr.left
+        curr = stack.pop()
+        k -= 1
+        if k == 0:
+            return curr.val          # k-th visited node mil gaya, turant ruk jao
+        curr = curr.right
+    return -1    # k valid ho toh yahan kabhi nahi pahunchenge`
+      },
+      {
+        title: "8. BFS Level Order + Basic Tree Utilities",
+        desc: "<b>Level Order</b> queue se chalta hai (level-by-level). Saath me roz kaam aane wale utilities: height, node count, same-tree check, invert tree.",
+        java: `// ----------------------------------------------------------
+// LEVEL ORDER (BFS) — Time O(N), Space O(W) (W = max width)
+// Trick: har level shuru karte waqt queue.size() freeze kar lo
+// ----------------------------------------------------------
+public List<List<Integer>> levelOrder(TreeNode root) {
+    List<List<Integer>> res = new ArrayList<>();
+    if (root == null) return res;
+    Queue<TreeNode> queue = new LinkedList<>();
+    queue.offer(root);
+    while (!queue.isEmpty()) {
+        int size = queue.size();                // isi level ke nodes ki ginti
+        List<Integer> level = new ArrayList<>();
+        for (int i = 0; i < size; i++) {
+            TreeNode node = queue.poll();
+            level.add(node.val);
+            if (node.left != null) queue.offer(node.left);    // agle level ke liye
+            if (node.right != null) queue.offer(node.right);
+        }
+        res.add(level);
+    }
+    return res;
+}
+
+// HEIGHT / MAX DEPTH: null = 0, warna 1 + bade bachche ki height
+public int maxDepth(TreeNode root) {
+    if (root == null) return 0;
+    return 1 + Math.max(maxDepth(root.left), maxDepth(root.right));
+}
+
+// NODE COUNT
+public int countNodes(TreeNode root) {
+    if (root == null) return 0;
+    return 1 + countNodes(root.left) + countNodes(root.right);
+}
+
+// SAME TREE: structure bhi same aur values bhi same
+public boolean isSameTree(TreeNode a, TreeNode b) {
+    if (a == null && b == null) return true;     // dono khatam -> same
+    if (a == null || b == null) return false;    // ek khatam, ek nahi -> different
+    return a.val == b.val
+        && isSameTree(a.left, b.left)
+        && isSameTree(a.right, b.right);
+}
+
+// INVERT (mirror) TREE: har node ke left/right swap
+public TreeNode invertTree(TreeNode root) {
+    if (root == null) return null;
+    TreeNode tmp = root.left;
+    root.left = invertTree(root.right);
+    root.right = invertTree(tmp);
+    return root;
+}`,
+        python: `# ----------------------------------------------------------
+# LEVEL ORDER (BFS) — Time O(N), Space O(W) (W = max width)
+# Trick: har level shuru karte waqt len(queue) freeze kar lo
+# ----------------------------------------------------------
+def level_order(root: Optional[TreeNode]) -> List[List[int]]:
+    res = []
+    if not root:
+        return res
+    queue = deque([root])
+    while queue:
+        size = len(queue)                 # isi level ke nodes ki ginti
+        level = []
+        for _ in range(size):
+            node = queue.popleft()
+            level.append(node.val)
+            if node.left:
+                queue.append(node.left)   # agle level ke liye
+            if node.right:
+                queue.append(node.right)
+        res.append(level)
+    return res
+
+# HEIGHT / MAX DEPTH: None = 0, warna 1 + bade bachche ki height
+def max_depth(root: Optional[TreeNode]) -> int:
+    if not root:
+        return 0
+    return 1 + max(max_depth(root.left), max_depth(root.right))
+
+# NODE COUNT
+def count_nodes(root: Optional[TreeNode]) -> int:
+    if not root:
+        return 0
+    return 1 + count_nodes(root.left) + count_nodes(root.right)
+
+# SAME TREE: structure bhi same aur values bhi same
+def is_same_tree(a: Optional[TreeNode], b: Optional[TreeNode]) -> bool:
+    if not a and not b:
+        return True                  # dono khatam -> same
+    if not a or not b:
+        return False                 # ek khatam, ek nahi -> different
+    return (a.val == b.val
+            and is_same_tree(a.left, b.left)
+            and is_same_tree(a.right, b.right))
+
+# INVERT (mirror) TREE: har node ke left/right swap
+def invert_tree(root: Optional[TreeNode]) -> Optional[TreeNode]:
+    if not root:
+        return None
+    root.left, root.right = invert_tree(root.right), invert_tree(root.left)
+    return root`
+      },
+      {
+        title: "9. Validate BST (Range Method + Inorder Method)",
+        desc: "Do standard tareeke. <b>Range method</b> (top-down min/max pass karo) sabse safe hai. <b>Inorder method</b>: inorder me har value pichhli se <b>strictly badi</b> honi chahiye.",
+        java: `// ----------------------------------------------------------
+// METHOD 1: Range (min, max) pass karo — Time O(N), Space O(H)
+// Long isliye: node.val Integer.MIN/MAX_VALUE ho sakti hai
+// ----------------------------------------------------------
+public boolean isValidBST(TreeNode root) {
+    return validate(root, Long.MIN_VALUE, Long.MAX_VALUE);
+}
+
+private boolean validate(TreeNode node, long low, long high) {
+    if (node == null) return true;                       // khali tree valid hai
+    if (node.val <= low || node.val >= high) return false; // strictly (low, high) ke andar
+    return validate(node.left, low, node.val)            // left: upper bound = node.val
+        && validate(node.right, node.val, high);         // right: lower bound = node.val
+}
+
+// ----------------------------------------------------------
+// METHOD 2: Iterative Inorder — pichhli value se hamesha badi honi chahiye
+// ----------------------------------------------------------
+public boolean isValidBSTInorder(TreeNode root) {
+    Deque<TreeNode> stack = new ArrayDeque<>();
+    TreeNode curr = root, prev = null;
+    while (curr != null || !stack.isEmpty()) {
+        while (curr != null) { stack.push(curr); curr = curr.left; }
+        curr = stack.pop();
+        if (prev != null && curr.val <= prev.val) return false;  // sorted order toot gaya
+        prev = curr;
+        curr = curr.right;
+    }
+    return true;
+}`,
+        python: `# ----------------------------------------------------------
+# METHOD 1: Range (min, max) pass karo — Time O(N), Space O(H)
+# ----------------------------------------------------------
+def is_valid_bst(root: Optional[TreeNode]) -> bool:
+    def validate(node, low, high):
+        if not node:
+            return True                                  # khali tree valid hai
+        if not (low < node.val < high):
+            return False                                 # strictly (low, high) ke andar
+        return (validate(node.left, low, node.val)       # left: upper bound = node.val
+                and validate(node.right, node.val, high))  # right: lower bound = node.val
+
+    return validate(root, float('-inf'), float('inf'))
+
+# ----------------------------------------------------------
+# METHOD 2: Iterative Inorder — pichhli value se hamesha badi honi chahiye
+# ----------------------------------------------------------
+def is_valid_bst_inorder(root: Optional[TreeNode]) -> bool:
+    stack, curr, prev = [], root, None
+    while curr or stack:
+        while curr:
+            stack.append(curr)
+            curr = curr.left
+        curr = stack.pop()
+        if prev is not None and curr.val <= prev:
+            return False                 # sorted order toot gaya
+        prev = curr.val
+        curr = curr.right
+    return True`
+      },
+      {
+        title: "10. Build a BST (Sorted Array / Preorder)",
+        desc: "<b>Sorted Array → Balanced BST</b>: middle = root (divide & conquer). <b>Preorder → BST</b>: ek index pointer + <b>upper bound</b> use karo, bina sort kiye O(N) me tree ban jata hai.",
+        java: `// ----------------------------------------------------------
+// SORTED ARRAY -> HEIGHT-BALANCED BST — Time O(N), Space O(log N)
+// ----------------------------------------------------------
+public TreeNode sortedArrayToBST(int[] nums) {
+    return build(nums, 0, nums.length - 1);
+}
+
+private TreeNode build(int[] nums, int left, int right) {
+    if (left > right) return null;               // range khali -> null
+    int mid = left + (right - left) / 2;         // overflow-safe middle
+    TreeNode root = new TreeNode(nums[mid]);     // beech wala = root
+    root.left = build(nums, left, mid - 1);      // chhoti values -> left
+    root.right = build(nums, mid + 1, right);    // badi values  -> right
+    return root;
+}
+
+// ----------------------------------------------------------
+// PREORDER ARRAY -> BST (LeetCode 1008) — Time O(N), Space O(H)
+// Preorder = Root, phir left subtree, phir right subtree.
+// 'upper' = is subtree me aane wali value ki STRICT upper limit
+// ----------------------------------------------------------
+private int idx = 0;                             // preorder me abhi kahan hain
+
+public TreeNode bstFromPreorder(int[] preorder) {
+    idx = 0;
+    return buildFromPreorder(preorder, Integer.MAX_VALUE);
+}
+
+private TreeNode buildFromPreorder(int[] pre, int upper) {
+    // Array khatam, ya agli value is subtree ke liye bahut badi -> yahan subtree khatam
+    if (idx == pre.length || pre[idx] > upper) return null;
+    TreeNode root = new TreeNode(pre[idx++]);    // agli value root bani
+    root.left = buildFromPreorder(pre, root.val);  // left: limit = root.val
+    root.right = buildFromPreorder(pre, upper);    // right: purani limit
+    return root;
+}`,
+        python: `# ----------------------------------------------------------
+# SORTED ARRAY -> HEIGHT-BALANCED BST — Time O(N), Space O(log N)
+# ----------------------------------------------------------
+def sorted_array_to_bst(nums: List[int]) -> Optional[TreeNode]:
+    def build(left, right):
+        if left > right:
+            return None                          # range khali -> None
+        mid = (left + right) // 2                # beech ka index
+        root = TreeNode(nums[mid])               # beech wala = root
+        root.left = build(left, mid - 1)         # chhoti values -> left
+        root.right = build(mid + 1, right)       # badi values  -> right
+        return root
+
+    return build(0, len(nums) - 1)
+
+# ----------------------------------------------------------
+# PREORDER ARRAY -> BST (LeetCode 1008) — Time O(N), Space O(H)
+# Preorder = Root, phir left subtree, phir right subtree.
+# 'upper' = is subtree me aane wali value ki STRICT upper limit
+# ----------------------------------------------------------
+def bst_from_preorder(preorder: List[int]) -> Optional[TreeNode]:
+    idx = 0                                      # preorder me abhi kahan hain
+
+    def build(upper):
+        nonlocal idx
+        # Array khatam, ya agli value is subtree ke liye bahut badi -> subtree khatam
+        if idx == len(preorder) or preorder[idx] > upper:
+            return None
+        root = TreeNode(preorder[idx])           # agli value root bani
+        idx += 1
+        root.left = build(root.val)              # left: limit = root.val
+        root.right = build(upper)                # right: purani limit
+        return root
+
+    return build(float('inf'))`
+      },
+      {
+        title: "11. LCA (BST + Normal Binary Tree)",
+        desc: "<b>BST me LCA</b>: split point dhoondo (O(H), O(1)). <b>Normal tree me LCA</b>: postorder me dono taraf search karo, jahan dono side se answer aaye wahi LCA.",
+        java: `// ----------------------------------------------------------
+// LCA in BST — Time O(H), Space O(1)
+// BST ki ordering use hoti hai: dono chhote -> left, dono bade -> right
+// ----------------------------------------------------------
+public TreeNode lcaBST(TreeNode root, TreeNode p, TreeNode q) {
+    TreeNode curr = root;
+    while (curr != null) {
+        if (p.val < curr.val && q.val < curr.val) curr = curr.left;        // dono left me
+        else if (p.val > curr.val && q.val > curr.val) curr = curr.right;  // dono right me
+        else return curr;     // raaste alag ho gaye (ya curr khud p/q hai) -> yahi LCA
+    }
+    return null;
+}
+
+// ----------------------------------------------------------
+// LCA in normal Binary Tree — Time O(N), Space O(H)
+// ----------------------------------------------------------
+public TreeNode lcaBinaryTree(TreeNode root, TreeNode p, TreeNode q) {
+    // null mila ya p/q mil gaya -> ye hi upar bhej do
+    if (root == null || root == p || root == q) return root;
+
+    TreeNode left = lcaBinaryTree(root.left, p, q);     // left subtree ka result
+    TreeNode right = lcaBinaryTree(root.right, p, q);   // right subtree ka result
+
+    if (left != null && right != null) return root;     // p ek side, q doosri side -> root = LCA
+    return left != null ? left : right;                 // sirf ek side me mila -> wahi upar bhejo
+}`,
+        python: `# ----------------------------------------------------------
+# LCA in BST — Time O(H), Space O(1)
+# BST ki ordering use hoti hai: dono chhote -> left, dono bade -> right
+# ----------------------------------------------------------
+def lca_bst(root: TreeNode, p: TreeNode, q: TreeNode) -> Optional[TreeNode]:
+    curr = root
+    while curr:
+        if p.val < curr.val and q.val < curr.val:
+            curr = curr.left          # dono left me
+        elif p.val > curr.val and q.val > curr.val:
+            curr = curr.right         # dono right me
+        else:
+            return curr               # raaste alag ho gaye (ya curr khud p/q hai) -> yahi LCA
+    return None
+
+# ----------------------------------------------------------
+# LCA in normal Binary Tree — Time O(N), Space O(H)
+# ----------------------------------------------------------
+def lca_binary_tree(root: Optional[TreeNode], p: TreeNode, q: TreeNode) -> Optional[TreeNode]:
+    # None mila ya p/q mil gaya -> ye hi upar bhej do
+    if not root or root == p or root == q:
+        return root
+
+    left = lca_binary_tree(root.left, p, q)       # left subtree ka result
+    right = lca_binary_tree(root.right, p, q)     # right subtree ka result
+
+    if left and right:
+        return root               # p ek side, q doosri side -> root = LCA
+    return left if left else right    # sirf ek side me mila -> wahi upar bhejo`
+      },
+      {
+        title: "12. BST Iterator (Controlled Inorder) — O(H) Memory",
+        desc: "Poora inorder list banane ki jagah sirf <b>left spine</b> stack me rakho. <code>next()</code> amortized <b>O(1)</b> time aur total memory sirf <b>O(H)</b>. Ye pattern 'Two Sum BST', 'BST Iterator II' follow-up me kaam aata hai.",
+        java: `// ----------------------------------------------------------
+// BSTIterator — next() amortized O(1), hasNext() O(1), Space O(H)
+// Stack ke top par hamesha 'agla smallest' node rehta hai.
+// ----------------------------------------------------------
+class BSTIterator {
+    private final Deque<TreeNode> stack = new ArrayDeque<>();
+
+    public BSTIterator(TreeNode root) {
+        pushLeft(root);                  // shuru me sirf left spine push
+    }
+
+    // node se shuru karke jitna left ja sako, sab stack me daalo
+    private void pushLeft(TreeNode node) {
+        while (node != null) {
+            stack.push(node);
+            node = node.left;
+        }
+    }
+
+    public int next() {
+        TreeNode node = stack.pop();     // top = abhi ka smallest
+        pushLeft(node.right);            // uske right subtree ki left spine push
+        return node.val;
+    }
+
+    public boolean hasNext() {
+        return !stack.isEmpty();
+    }
+}`,
+        python: `# ----------------------------------------------------------
+# BSTIterator — next() amortized O(1), hasNext() O(1), Space O(H)
+# Stack ke top par hamesha 'agla smallest' node rehta hai.
+# ----------------------------------------------------------
+class BSTIterator:
+    def __init__(self, root: Optional[TreeNode]):
+        self.stack = []
+        self._push_left(root)            # shuru me sirf left spine push
+
+    # node se shuru karke jitna left ja sako, sab stack me daalo
+    def _push_left(self, node: Optional[TreeNode]) -> None:
+        while node:
+            self.stack.append(node)
+            node = node.left
+
+    def next(self) -> int:
+        node = self.stack.pop()          # top = abhi ka smallest
+        self._push_left(node.right)      # uske right subtree ki left spine push
+        return node.val
+
+    def hasNext(self) -> bool:
+        return len(self.stack) > 0`
+      }
+    ];
+
+    // ==========================================================
+    // 20 QUESTIONS
+    // statement / examples / constraints = English (LeetCode / NeetCode style)
+    // statementHi = Hinglish explanation
+    // ==========================================================
+    const questions = [
+      {
+        id: 1, lc: 108, premium: false,
+        title: "Convert Sorted Array to Binary Search Tree",
+        difficulty: "Easy",
+        pattern: "Divide & Conquer (Mid = Root)",
+        time: "O(N)",
+        space: "O(log N)",
+        statement: "Given an integer array <code>nums</code> where the elements are sorted in <b>ascending order</b>, convert it to a <b>height-balanced</b> binary search tree.<br>A <b>height-balanced</b> binary tree is a binary tree in which the depth of the two subtrees of every node never differs by more than one.",
+        examples: [
+          { input: "nums = [-10,-3,0,5,9]", output: "[0,-3,9,-10,null,5]", explain: "[0,-10,5,null,-3,null,9] is also accepted. Any height-balanced BST is a valid answer." },
+          { input: "nums = [1,3]", output: "[3,1]", explain: "[1,null,3] is also accepted." }
+        ],
+        constraints: [
+          "1 <= nums.length <= 10^4",
+          "-10^4 <= nums[i] <= 10^4",
+          "nums is sorted in a strictly increasing order."
+        ],
+        statementHi: "Tumhe ek <b>ascending order me sorted</b> array <code>nums</code> diya gaya hai. Isse ek <b>height-balanced BST</b> banana hai. Height-balanced ka matlab: har node ke left aur right subtree ki height ka difference <b>1 se zyada nahi</b> hona chahiye. Jawab me koi bhi valid balanced BST chalega (unique answer zaroori nahi).",
+        memoryFlow: `Sorted Array: [ -10, -3, 0, 5, 9 ]
+       │
+       ▼
+Pick MIDDLE (mid = left + (right - left) / 2) as ROOT  →  0
+       ├──► Left  half [-10, -3] ──► root.left  = build(left, mid - 1)
+       └──► Right half [ 5,  9 ] ──► root.right = build(mid + 1, right)
+
+Base case: left > right  ──►  return null (empty range)`,
+        memoryTip: "Balanced BST chahiye = aadhe elements left me, aadhe right me. Sorted array ka 'mid' hi root banta hai!",
+        intuition: `<b>Key observation:</b> Sorted array = kisi BST ka <b>inorder traversal</b>. Hume bas us inorder se tree wapas banana hai.
+<b>Balanced kaise?</b> Agar har baar beech ka element root banayein, toh left aur right me lagbhag barabar elements bachte hain, isliye height hamesha ~log N rehti hai.
+
+<b>Step-by-step:</b>
+1. Range <code>[left, right]</code> lo. Agar <code>left &gt; right</code> toh empty subtree → <code>null</code>.
+2. <code>mid = left + (right - left) / 2</code> → <code>nums[mid]</code> ka naya node (root).
+3. Left half <code>[left, mid-1]</code> se recursively <code>root.left</code> banao.
+4. Right half <code>[mid+1, right]</code> se recursively <code>root.right</code> banao.
+5. Root return karo.
+
+<b>Dry run</b> <code>[-10,-3,0,5,9]</code>: mid=2 → root 0. Left <code>[-10,-3]</code>: mid=0 → -10 (iska right child -3). Right <code>[5,9]</code>: mid=3 → 5 (iska right child 9). Tree: <code>[0,-10,5,null,-3,null,9]</code> ✔.
+
+<b>Complexity:</b> Har element ek baar root banta hai → O(N) time. Recursion depth ~log N → O(log N) space (output tree ko chhodkar).`,
+        pitfalls: [
+          "<code>(left + right) / 2</code> bade indexes par overflow kar sakta hai → safe form <code>left + (right - left) / 2</code> use karo.",
+          "Python me <code>nums[:mid]</code> jaisi slicing mat karo — har baar copy banti hai (O(N log N)). Sirf <code>left/right</code> indexes pass karo.",
+          "Even length par lower-mid ya upper-mid dono accept hote hain — dono balanced tree dete hain."
+        ],
+        java: `class Solution {
+    public TreeNode sortedArrayToBST(int[] nums) {
+        // Poore array [0 .. n-1] se tree banana shuru karo
+        return buildBST(nums, 0, nums.length - 1);
+    }
+
+    // nums[left..right] (dono inclusive) se balanced BST banakar uska root return karta hai
+    private TreeNode buildBST(int[] nums, int left, int right) {
+        // Base Case: left > right matlab is range me koi element bacha hi nahi
+        // -> yahan subtree khali hoga, isliye null return
+        if (left > right) return null;
+
+        // Step 1: Beech ka index nikalo
+        // left + (right - left) / 2 -> (left + right) / 2 ke jaisa, par overflow se safe
+        int mid = left + (right - left) / 2;
+
+        // Step 2: Beech wala element ROOT banega
+        // Array sorted hai: mid ke left ke sab chhote, right ke sab bade
+        // -> BST property apne aap sahi ho jati hai
+        TreeNode root = new TreeNode(nums[mid]);
+
+        // Step 3: Left half [left .. mid-1] se LEFT subtree banao
+        root.left = buildBST(nums, left, mid - 1);
+
+        // Step 4: Right half [mid+1 .. right] se RIGHT subtree banao
+        root.right = buildBST(nums, mid + 1, right);
+
+        // Step 5: Ye subtree ready hai, parent ko wapas do
+        return root;
+    }
+}`,
+        python: `class Solution:
+    def sortedArrayToBST(self, nums: List[int]) -> Optional[TreeNode]:
+        # nums[left..right] (dono inclusive) se balanced BST banakar root return karta hai
+        def build(left: int, right: int) -> Optional[TreeNode]:
+            # Base Case: left > right matlab is range me koi element bacha hi nahi
+            # -> yahan subtree khali hoga, isliye None return
+            if left > right:
+                return None
+
+            # Step 1: Beech ka index (Python me integer overflow ka darr nahi)
+            mid = (left + right) // 2
+
+            # Step 2: Beech wala element ROOT banega
+            # Array sorted hai: mid ke left ke sab chhote, right ke sab bade
+            root = TreeNode(nums[mid])
+
+            # Step 3 & 4: Left half aur Right half se subtrees banao
+            # (slicing nahi, sirf indexes pass kiye -> extra copy nahi banti)
+            root.left = build(left, mid - 1)
+            root.right = build(mid + 1, right)
+
+            # Step 5: Ye subtree ready hai, parent ko wapas do
+            return root
+
+        # Poore array [0 .. n-1] se shuru
+        return build(0, len(nums) - 1)`
+      },
+      {
+        id: 2, lc: 938, premium: false,
+        title: "Range Sum of BST",
+        difficulty: "Easy",
+        pattern: "BST Pruning (Branch Cutting)",
+        time: "O(N)",
+        space: "O(H)",
+        statement: "Given the <code>root</code> node of a binary search tree and two integers <code>low</code> and <code>high</code>, return <i>the sum of values of all nodes with a value in the <b>inclusive</b> range</i> <code>[low, high]</code>.",
+        examples: [
+          { input: "root = [10,5,15,3,7,null,18], low = 7, high = 15", output: "32", explain: "Nodes 7, 10, and 15 are in the range [7, 15]. 7 + 10 + 15 = 32." },
+          { input: "root = [10,5,15,3,7,13,18,1,null,6], low = 6, high = 10", output: "23", explain: "Nodes 6, 7, and 10 are in the range [6, 10]. 6 + 7 + 10 = 23." }
+        ],
+        constraints: [
+          "The number of nodes in the tree is in the range [1, 2 * 10^4].",
+          "1 <= Node.val <= 10^5",
+          "1 <= low <= high <= 10^5",
+          "All Node.val are unique."
+        ],
+        statementHi: "Ek BST aur do integers <code>low</code> aur <code>high</code> diye hain. Tree ke un <b>sabhi nodes ki values ka sum</b> return karo jo range <code>[low, high]</code> me aati hain (dono end <b>inclusive</b>).",
+        memoryFlow: `At Current Node:
+  ├── root.val < low  ──► root + poora LEFT subtree range se chhote hain
+  │                       ──► Left SKIP, sirf RIGHT jao
+  ├── root.val > high ──► root + poora RIGHT subtree range se bade hain
+  │                       ──► Right SKIP, sirf LEFT jao
+  └── low ≤ val ≤ high ──► root.val + (Left sum) + (Right sum)`,
+        memoryTip: "Bekar branches me mat jao! Node 'low' se chhota hai toh left branch ko kaat do (prune).",
+        intuition: `<b>Brute force:</b> poora tree traverse karo, range check karke sum karo → O(N). Ye chalta hai, par BST ki property use nahi hui.
+
+<b>Smart idea (pruning):</b> BST me left ki values chhoti, right ki badi hoti hain. Isliye:
+1. <code>root.val &lt; low</code> → root aur uska poora <b>left</b> subtree range se chhote → sirf <b>right</b> me jao.
+2. <code>root.val &gt; high</code> → root aur uska poora <b>right</b> subtree range se bade → sirf <b>left</b> me jao.
+3. Warna root range me hai → <code>root.val</code> add karo aur <b>dono</b> side jao.
+
+<b>Dry run</b> (<code>[10,5,15,3,7,null,18]</code>, low=7, high=15): 10 in-range → 10 + left(5) + right(15). 5 &lt; 7 → sirf right(7) → 7 in-range → 7. 15 in-range → 15 + left(null)=0 + right(18). 18 &gt; 15 → left(null) = 0. Total = 10 + 7 + 15 = <b>32</b> ✔.
+
+<b>Complexity:</b> Worst case (poora tree range me) O(N). Recursion stack O(H).`,
+        pitfalls: [
+          "Range <b>inclusive</b> hai — <code>val == low</code> ya <code>val == high</code> par bhi add karna hai (isliye strict &lt; / &gt; se hi skip karo).",
+          "Pruning me galat side mat chuno: <code>val &lt; low</code> → <b>right</b> jao (left nahi).",
+          "Base case <code>null → 0</code> bhoolna mat."
+        ],
+        java: `class Solution {
+    public int rangeSumBST(TreeNode root, int low, int high) {
+        // Base Case: khali subtree ka sum 0 hota hai
+        if (root == null) return 0;
+
+        // Case 1: root.val < low
+        // Root aur uska poora LEFT subtree low se chhote hain -> range ke bahar.
+        // Left ko skip karke sirf RIGHT subtree me dhoondo.
+        if (root.val < low) return rangeSumBST(root.right, low, high);
+
+        // Case 2: root.val > high
+        // Root aur uska poora RIGHT subtree high se bade hain -> range ke bahar.
+        // Right ko skip karke sirf LEFT subtree me dhoondo.
+        if (root.val > high) return rangeSumBST(root.left, low, high);
+
+        // Case 3: low <= root.val <= high -> root ki value count hogi.
+        // Left aur right dono me bhi range wali values ho sakti hain, isliye dono jao.
+        return root.val
+             + rangeSumBST(root.left, low, high)
+             + rangeSumBST(root.right, low, high);
+    }
+}`,
+        python: `class Solution:
+    def rangeSumBST(self, root: Optional[TreeNode], low: int, high: int) -> int:
+        # Base Case: khali subtree ka sum 0 hota hai
+        if not root:
+            return 0
+
+        # Case 1: root.val < low
+        # Root aur uska poora LEFT subtree low se chhote hain -> range ke bahar.
+        # Left skip karke sirf RIGHT subtree me jao.
+        if root.val < low:
+            return self.rangeSumBST(root.right, low, high)
+
+        # Case 2: root.val > high
+        # Root aur uska poora RIGHT subtree high se bade hain -> range ke bahar.
+        # Right skip karke sirf LEFT subtree me jao.
+        if root.val > high:
+            return self.rangeSumBST(root.left, low, high)
+
+        # Case 3: low <= root.val <= high -> root ki value count hogi.
+        # Dono side me range wali values ho sakti hain, isliye dono jao.
+        return (root.val
+                + self.rangeSumBST(root.left, low, high)
+                + self.rangeSumBST(root.right, low, high))`
+      },
+      {
+        id: 3, lc: 270, premium: false,
+        title: "Closest Binary Search Tree Value",
+        difficulty: "Easy",
+        pattern: "Binary Search Walk on Tree",
+        time: "O(H)",
+        space: "O(1)",
+        statement: "Given the <code>root</code> of a binary search tree and a <code>target</code> value, return <i>the value in the BST that is closest to the</i> <code>target</code>. If there are multiple answers, print the <b>smallest</b>.",
+        examples: [
+          { input: "root = [4,2,5,1,3], target = 3.714286", output: "4", explain: "|4 - 3.714286| = 0.285714 is the smallest difference." },
+          { input: "root = [1], target = 4.428571", output: "1", explain: "Only one node in the tree." }
+        ],
+        constraints: [
+          "The number of nodes in the tree is in the range [1, 10^4].",
+          "0 <= Node.val <= 10^9",
+          "-10^9 <= target <= 10^9"
+        ],
+        statementHi: "Ek BST aur ek <code>target</code> (decimal bhi ho sakta hai) diya hai. Tree ki wo value return karo jo <b>target ke sabse kareeb</b> ho. Agar do values barabar doori par hain toh <b>chhoti wali</b> return karo.",
+        memoryFlow: `Start: curr = root, closest = root.val
+While (curr != null):
+  1. |curr.val - target| < |closest - target| ?  ──► closest = curr.val
+  2. target < curr.val ? curr = curr.left : curr = curr.right
+Return closest`,
+        memoryTip: "Har step par 'closest' update karo; target chhota ho toh Left jao, warna Right.",
+        intuition: `<b>Idea:</b> Binary search ki tarah tree me neeche utro. Jo bhi node mile, wo ek <b>candidate</b> hai; sabse achha candidate yaad rakho.
+
+<b>Step-by-step:</b>
+1. <code>closest = root.val</code> se shuru karo.
+2. Har node par <code>|node.val - target|</code> ko <code>|closest - target|</code> se compare karo; behtar ho toh <code>closest</code> update karo.
+3. <b>Tie-break:</b> doori barabar ho toh chhoti value rakho (problem ka rule).
+4. <code>target &lt; node.val</code> → left jao (right side ki values aur door hongi), warna right jao.
+5. Null aane par loop khatam, <code>closest</code> return.
+
+<b>Kyun sahi?</b> Agar target &lt; node.val hai, toh node ke right subtree ki saari values node.val se bhi bade hain, yaani target se aur door → unhe dekhne ka fayda nahi.
+
+<b>Complexity:</b> Sirf ek root-to-leaf path → O(H) time, O(1) space (iterative).`,
+        pitfalls: [
+          "Difference <code>double</code> me nikalo (<code>Math.abs(root.val - target)</code> double deta hai). Integer division ya cast mat karo.",
+          "Tie ka case: target = 3.5, nodes 3 aur 4 → answer <b>3</b> (chhota).",
+          "Sirf leaf tak jaane se pehle hi return mat karo — closest ancestor bhi ho sakta hai."
+        ],
+        java: `class Solution {
+    public int closestValue(TreeNode root, double target) {
+        // Shuruaati candidate: root khud
+        int closest = root.val;
+
+        // Binary search jaisa raasta: ek root-to-leaf path hi dekhna hai
+        while (root != null) {
+            // Current node aur ab tak ke best candidate ki target se doori
+            double currDiff = Math.abs(root.val - target);
+            double bestDiff = Math.abs(closest - target);
+
+            // Update karo agar:
+            //  (a) current node strictly zyada paas hai, ya
+            //  (b) doori barabar hai par current value chhoti hai (tie-break: smallest)
+            if (currDiff < bestDiff || (currDiff == bestDiff && root.val < closest)) {
+                closest = root.val;
+            }
+
+            // Agla step: target chhota hai toh left, warna right
+            // (doosri side ki values target se aur door hongi)
+            if (target < root.val) root = root.left;
+            else root = root.right;
+        }
+        return closest;
+    }
+}`,
+        python: `class Solution:
+    def closestValue(self, root: Optional[TreeNode], target: float) -> int:
+        # Shuruaati candidate: root khud
+        closest = root.val
+
+        # Binary search jaisa raasta: ek root-to-leaf path hi dekhna hai
+        while root:
+            # Current node aur ab tak ke best candidate ki target se doori
+            curr_diff = abs(root.val - target)
+            best_diff = abs(closest - target)
+
+            # Update karo agar:
+            #  (a) current node strictly zyada paas hai, ya
+            #  (b) doori barabar hai par current value chhoti hai (tie-break: smallest)
+            if curr_diff < best_diff or (curr_diff == best_diff and root.val < closest):
+                closest = root.val
+
+            # Agla step: target chhota hai toh left, warna right
+            if target < root.val:
+                root = root.left
+            else:
+                root = root.right
+        return closest`
+      },
+      {
+        id: 4, lc: 783, premium: false,
+        title: "Minimum Distance Between BST Nodes",
+        difficulty: "Easy",
+        pattern: "Inorder Traversal + Prev Pointer",
+        time: "O(N)",
+        space: "O(H)",
+        statement: "Given the <code>root</code> of a Binary Search Tree (BST), return <i>the minimum difference between the values of any two different nodes in the tree</i>.",
+        examples: [
+          { input: "root = [4,2,6,1,3]", output: "1", explain: "For example, |2 - 1| = 1 and |3 - 2| = 1." },
+          { input: "root = [1,0,48,null,null,12,49]", output: "1", explain: "|49 - 48| = 1." }
+        ],
+        constraints: [
+          "The number of nodes in the tree is in the range [2, 100].",
+          "0 <= Node.val <= 10^5"
+        ],
+        statementHi: "Ek BST diya hai. Tree ke <b>kisi bhi do alag nodes</b> ki values ke beech ka <b>minimum absolute difference</b> return karo.",
+        memoryFlow: `Inorder Traversal (Sorted Stream):
+  1 ──► 4 ──► 7 ──► 10
+        ▲     ▲
+      prev   curr    →  minDiff = min(minDiff, curr - prev)`,
+        memoryTip: "BST ka inorder hamesha sorted hota hai. Minimum difference hamesha <b>adjacent</b> elements me hi milta hai!",
+        intuition: `<b>Observation:</b> Sorted sequence me minimum difference hamesha do <b>padosi (adjacent)</b> elements ke beech hota hai. Agar a &lt; b &lt; c ho toh c - a, b - a ya c - b se bada hi hoga.
+
+<b>Step-by-step:</b>
+1. Inorder traversal (Left → Root → Right) karo — values ascending order me aayengi.
+2. Ek variable <code>prev</code> me pichhli visited value rakho (shuru me <code>null</code>).
+3. Har node par, agar <code>prev</code> exist karta hai: <code>minDiff = min(minDiff, node.val - prev)</code>.
+4. Phir <code>prev = node.val</code> karo aur right subtree me jao.
+
+<b>Dry run</b> <code>[4,2,6,1,3]</code>: inorder = 1,2,3,4,6. Diffs: 1,1,1,2 → min = <b>1</b>.
+
+<b>Complexity:</b> Har node ek baar → O(N). Recursion stack O(H).`,
+        pitfalls: [
+          "Sirf <b>parent-child</b> difference nikalna galat hai: <code>[4,2,6,1,3]</code> me 3 aur 4 ka difference parent-child nahi hai (3 node 2 ka child hai), par inorder me 3 ke bilkul baad 4 aata hai. Isliye <b>inorder adjacent</b> pairs dekho.",
+          "<code>prev</code> ko shuru me <code>null</code> / <code>None</code> rakho (0 nahi), warna galat first difference ban jayega.",
+          "Java me <code>prev</code> ko <code>Integer</code> (nullable) rakho; <code>minDiff</code> ko <code>Integer.MAX_VALUE</code> se initialise karo."
+        ],
+        java: `class Solution {
+    private Integer prev;     // inorder me pichhli visited node ki value (shuru me null)
+    private int minDiff;      // ab tak ka minimum difference
+
+    public int minDiffInBST(TreeNode root) {
+        prev = null;                      // reset (LeetCode multiple test cases chalata hai)
+        minDiff = Integer.MAX_VALUE;      // sabse bada value, taaki pehla diff isse chhota ho
+        inorder(root);
+        return minDiff;
+    }
+
+    private void inorder(TreeNode node) {
+        if (node == null) return;
+
+        // 1) Pehle poora LEFT subtree (chhoti values)
+        inorder(node.left);
+
+        // 2) Ab current node: pichhli (sorted me just chhoti) value se difference nikalo
+        if (prev != null) {
+            minDiff = Math.min(minDiff, node.val - prev);
+        }
+        prev = node.val;                  // ab current hi agle node ke liye 'prev' hai
+
+        // 3) Phir RIGHT subtree (badi values)
+        inorder(node.right);
+    }
+}`,
+        python: `class Solution:
+    def minDiffInBST(self, root: Optional[TreeNode]) -> int:
+        prev = None                  # inorder me pichhli visited node ki value
+        min_diff = float('inf')      # ab tak ka minimum difference
+
+        def inorder(node):
+            # nonlocal: bahar wale prev / min_diff ko andar se badalne ke liye
+            nonlocal prev, min_diff
+            if not node:
+                return
+
+            # 1) Pehle poora LEFT subtree (chhoti values)
+            inorder(node.left)
+
+            # 2) Current node: pichhli value se difference nikalo
+            if prev is not None:
+                min_diff = min(min_diff, node.val - prev)
+            prev = node.val          # ab current hi agle node ke liye 'prev' hai
+
+            # 3) Phir RIGHT subtree (badi values)
+            inorder(node.right)
+
+        inorder(root)
+        return int(min_diff)`
+      },
+      {
+        id: 5, lc: 98, premium: false,
+        title: "Validate Binary Search Tree",
+        difficulty: "Medium",
+        pattern: "Top-Down Range Validation (min, max)",
+        time: "O(N)",
+        space: "O(H)",
+        statement: "Given the <code>root</code> of a binary tree, <i>determine if it is a valid binary search tree (BST)</i>.<br>A <b>valid BST</b> is defined as follows:<ul class=\"constraints\"><li>The left subtree of a node contains only nodes with keys <b>strictly less than</b> the node's key.</li><li>The right subtree of a node contains only nodes with keys <b>strictly greater than</b> the node's key.</li><li>Both the left and right subtrees must also be binary search trees.</li></ul>",
+        examples: [
+          { input: "root = [2,1,3]", output: "true", explain: "" },
+          { input: "root = [5,1,4,null,null,3,6]", output: "false", explain: "The root node's value is 5 but its right child's value is 4." }
+        ],
+        constraints: [
+          "The number of nodes in the tree is in the range [1, 10^4].",
+          "-2^31 <= Node.val <= 2^31 - 1"
+        ],
+        statementHi: "Ek binary tree diya hai. Batao ki kya ye ek <b>valid BST</b> hai? Rules: left subtree ke <b>saare</b> nodes current node se <b>strictly chhote</b>, right subtree ke <b>saare</b> nodes <b>strictly bade</b>, aur dono subtrees khud bhi valid BST hone chahiye. (Duplicates allowed nahi.)",
+        memoryFlow: `Root: (-∞, +∞)
+  ├── Left  subtree: (low,       root.val)   ← upper bound update
+  └── Right subtree: (root.val,  high     )   ← lower bound update
+Har node apni range (low, high) ke STRICTLY andar hona chahiye!`,
+        memoryTip: "Sirf immediate parent se compare mat karo! Har node ke saath valid range (min, max) pass karo.",
+        intuition: `<b>Galti jo sab karte hain:</b> sirf <code>node.left.val &lt; node.val &lt; node.right.val</code> check karna. Example <code>[5,1,4,null,null,3,6]</code>: node 4 ke liye 3 &lt; 4 &lt; 6 sahi dikhta hai, par 3 root 5 ke <b>right</b> subtree me hai aur 3 &lt; 5 → <b>invalid</b>!
+
+<b>Sahi idea:</b> Har node ke liye ek <b>allowed range (low, high)</b> maintain karo.
+1. Root ke liye range = (-∞, +∞).
+2. Left child jaye toh <b>upper bound</b> = parent.val → range (low, parent.val).
+3. Right child jaye toh <b>lower bound</b> = parent.val → range (parent.val, high).
+4. Agar koi node <code>val &lt;= low</code> ya <code>val &gt;= high</code> ho → <code>false</code>.
+5. Null node valid hai (<code>true</code>).
+
+<b>Dry run</b> <code>[5,1,4,null,null,3,6]</code>: 5 in (-∞,∞) ✔ → right 4 in (5,∞)? 4 &le; 5 ✘ → <b>false</b>.
+
+<b>Complexity:</b> O(N) time, O(H) stack. (Alternative: inorder traversal me values strictly increasing honi chahiye.)`,
+        pitfalls: [
+          "Bounds ke liye <code>Long</code> use karo — <code>Integer.MIN_VALUE</code> / <code>MAX_VALUE</code> khud node value ho sakti hain.",
+          "Comparison <b>strict</b> hai: <code>&lt;=</code> / <code>&gt;=</code> par false. Duplicate values invalid hain.",
+          "Sirf parent-child compare karna wrong hai; poori ancestors ki limit chahiye."
+        ],
+        java: `class Solution {
+    public boolean isValidBST(TreeNode root) {
+        // Shuru me koi limit nahi: (-infinity, +infinity)
+        // Long isliye, kyunki node.val Integer.MIN_VALUE / MAX_VALUE bhi ho sakti hai
+        return validate(root, Long.MIN_VALUE, Long.MAX_VALUE);
+    }
+
+    // node ki value STRICTLY (minVal, maxVal) ke andar honi chahiye
+    private boolean validate(TreeNode node, long minVal, long maxVal) {
+        // Khali subtree hamesha valid hota hai
+        if (node == null) return true;
+
+        // Is node ki value allowed range se bahar hai -> BST invalid
+        // (<= aur >= isliye ki duplicates allowed nahi)
+        if (node.val <= minVal || node.val >= maxVal) return false;
+
+        // Left subtree: saari values node.val se chhoti -> upper bound = node.val
+        // Right subtree: saari values node.val se badi -> lower bound = node.val
+        // Dono subtrees valid hone chahiye -> &&
+        return validate(node.left, minVal, node.val)
+            && validate(node.right, node.val, maxVal);
+    }
+}`,
+        python: `class Solution:
+    def isValidBST(self, root: Optional[TreeNode]) -> bool:
+        # node ki value STRICTLY (min_val, max_val) ke andar honi chahiye
+        def validate(node, min_val, max_val):
+            # Khali subtree hamesha valid hota hai
+            if not node:
+                return True
+
+            # Is node ki value allowed range se bahar hai -> BST invalid
+            # (strict comparison: duplicates allowed nahi)
+            if not (min_val < node.val < max_val):
+                return False
+
+            # Left subtree: upper bound = node.val
+            # Right subtree: lower bound = node.val
+            # Dono subtrees valid hone chahiye -> and
+            return (validate(node.left, min_val, node.val)
+                    and validate(node.right, node.val, max_val))
+
+        # Shuru me koi limit nahi: (-infinity, +infinity)
+        return validate(root, float('-inf'), float('inf'))`
+      },
+      {
+        id: 6, lc: 230, premium: false,
+        title: "Kth Smallest Element in a BST",
+        difficulty: "Medium",
+        pattern: "Inorder Traversal Counter",
+        time: "O(H + K)",
+        space: "O(H)",
+        statement: "Given the <code>root</code> of a binary search tree, and an integer <code>k</code>, return <i>the</i> <code>k<sup>th</sup></code> <i>smallest value (<b>1-indexed</b>) of all the values of the nodes in the tree</i>.",
+        examples: [
+          { input: "root = [3,1,4,null,2], k = 1", output: "1", explain: "" },
+          { input: "root = [5,3,6,2,4,null,null,1], k = 3", output: "3", explain: "Inorder = 1,2,3,4,5,6 so the 3rd smallest is 3." }
+        ],
+        constraints: [
+          "The number of nodes in the tree is n.",
+          "1 <= k <= n <= 10^4",
+          "0 <= Node.val <= 10^4"
+        ],
+        statementHi: "Ek BST aur ek integer <code>k</code> diya hai. Tree ki saari values me se <b>k-th sabse chhoti value</b> return karo (counting <b>1 se</b> shuru hoti hai).<br><i>Follow-up:</i> agar tree me bar-bar insert/delete ho aur k-th smallest bar-bar poochha jaye toh kaise optimize karoge? (Har node me subtree size store karo.)",
+        memoryFlow: `Inorder = Sorted Order:
+  Visit Left ──► Visit Root (count++) ──► if count == k → STOP & RETURN!
+  (answer mil gaya toh right subtree me jaane ki zaroorat nahi)`,
+        memoryTip: "Kth smallest in BST = inorder traversal ka K-th visited node!",
+        intuition: `<b>Observation:</b> BST ka inorder = ascending sorted list. Toh k-th smallest = inorder ka k-th element.
+
+<b>Step-by-step:</b>
+1. Inorder traversal karo (Left → Root → Right).
+2. Ek <code>count</code> rakho. Left subtree se laut kar agar <code>count &ge; k</code> hai toh answer mil chuka, turant wapas jao.
+3. Warna <code>count++</code>. Agar <code>count == k</code> → <code>ans = node.val</code>, ruk jao.
+4. Warna right subtree me jao.
+
+<b>Dry run</b> <code>[5,3,6,2,4,null,null,1]</code>, k=3: inorder chalta hai 1 (count=1), 2 (count=2), 3 (count=3 → ans=3) ✔. 4,5,6 dekhe hi nahi.
+
+<b>Complexity:</b> Leftmost node tak H steps + k visits → O(H + K). Stack O(H).
+
+<b>Iterative version</b> (Home page template #7) bhi yahi kaam karta hai bina recursion ke.`,
+        pitfalls: [
+          "<b>1-indexed</b> hai: k=1 matlab sabse chhoti value.",
+          "Answer milne ke baad bhi traversal chalate rehna wasteful hai — early exit lagao.",
+          "Count/ans ko recursion ke bahar rakho (field / <code>nonlocal</code>), warna har call apni copy banayegi."
+        ],
+        java: `class Solution {
+    private int count;   // ab tak kitne nodes inorder me visit ho chuke
+    private int ans;     // k-th smallest ka answer
+
+    public int kthSmallest(TreeNode root, int k) {
+        count = 0;       // reset
+        ans = -1;
+        inorder(root, k);
+        return ans;
+    }
+
+    private void inorder(TreeNode node, int k) {
+        // Khali node, ya answer pehle hi mil chuka -> aage kuch mat karo
+        if (node == null || count >= k) return;
+
+        // 1) Pehle left subtree (chhoti values)
+        inorder(node.left, k);
+
+        // Left me hi k-th mil gaya ho toh yahan count mat badhao, seedha wapas jao
+        if (count >= k) return;
+
+        // 2) Current node visit hua -> ginti badhao
+        count++;
+        if (count == k) {
+            ans = node.val;      // k-th smallest yahi hai
+            return;              // right subtree dekhne ki zaroorat nahi
+        }
+
+        // 3) Abhi k tak nahi pahunche -> right subtree (badi values)
+        inorder(node.right, k);
+    }
+}`,
+        python: `class Solution:
+    def kthSmallest(self, root: Optional[TreeNode], k: int) -> int:
+        count = 0      # ab tak kitne nodes inorder me visit ho chuke
+        ans = -1       # k-th smallest ka answer
+
+        def inorder(node):
+            nonlocal count, ans
+            # Khali node, ya answer pehle hi mil chuka -> aage kuch mat karo
+            if not node or count >= k:
+                return
+
+            # 1) Pehle left subtree (chhoti values)
+            inorder(node.left)
+
+            # Left me hi k-th mil gaya ho toh yahan count mat badhao, seedha wapas jao
+            if count >= k:
+                return
+
+            # 2) Current node visit hua -> ginti badhao
+            count += 1
+            if count == k:
+                ans = node.val       # k-th smallest yahi hai
+                return               # right subtree dekhne ki zaroorat nahi
+
+            # 3) Abhi k tak nahi pahunche -> right subtree (badi values)
+            inorder(node.right)
+
+        inorder(root)
+        return ans`
+      },
+      {
+        id: 7, lc: 235, premium: false,
+        title: "Lowest Common Ancestor of a Binary Search Tree",
+        difficulty: "Medium",
+        pattern: "Find the Split Point in BST",
+        time: "O(H)",
+        space: "O(1)",
+        statement: "Given a binary search tree (BST), find the lowest common ancestor (LCA) node of two given nodes in the BST.<br>According to the definition of LCA: &ldquo;The lowest common ancestor is defined between two nodes <code>p</code> and <code>q</code> as the lowest node in <code>T</code> that has both <code>p</code> and <code>q</code> as descendants (where we allow <b>a node to be a descendant of itself</b>).&rdquo;",
+        examples: [
+          { input: "root = [6,2,8,0,4,7,9,null,null,3,5], p = 2, q = 8", output: "6", explain: "The LCA of nodes 2 and 8 is 6." },
+          { input: "root = [6,2,8,0,4,7,9,null,null,3,5], p = 2, q = 4", output: "2", explain: "The LCA of nodes 2 and 4 is 2, since a node can be a descendant of itself." },
+          { input: "root = [2,1], p = 2, q = 1", output: "2", explain: "" }
+        ],
+        constraints: [
+          "The number of nodes in the tree is in the range [2, 10^5].",
+          "-10^9 <= Node.val <= 10^9",
+          "All Node.val are unique.",
+          "p != q",
+          "p and q will exist in the BST."
+        ],
+        statementHi: "BST me do nodes <code>p</code> aur <code>q</code> diye hain. Unka <b>Lowest Common Ancestor (LCA)</b> dhoondo — yaani wo sabse neeche wala node jiske neeche (ya jo khud) p aur q dono aate hon. <b>Ek node khud ka descendant maana jata hai</b>, isliye p hi q ka ancestor ho toh answer p hota hai.",
+        memoryFlow: `At node 'curr':
+  ├── p & q DONO curr se chhote ──► LCA left me hai  ──► curr = curr.left
+  ├── p & q DONO curr se bade   ──► LCA right me hai ──► curr = curr.right
+  └── Raaste ALAG (ek chhota, ek bada) ya curr == p/q ──► return curr  (SPLIT POINT)`,
+        memoryTip: "Jis node par p aur q ke raste alag ho jayein (ya node khud p/q ho), wahi LCA hai!",
+        intuition: `<b>Idea:</b> BST me left ki values chhoti, right ki badi. Root se utarte hue dekho ki p aur q kis taraf jaate hain.
+
+<b>Step-by-step:</b>
+1. <code>curr = root</code> se shuru.
+2. Agar <b>dono</b> p aur q ki values <code>curr.val</code> se chhoti → dono left subtree me → <code>curr = curr.left</code>.
+3. Agar <b>dono</b> badi → <code>curr = curr.right</code>.
+4. Warna: ek chhota/ek bada (raaste alag) <b>ya</b> curr khud p ya q hai → <code>curr</code> hi LCA hai.
+
+<b>Dry run</b> (<code>[6,2,8,0,4,7,9,null,null,3,5]</code>, p=2, q=4): 6: dono &lt; 6 → left (2). 2: p=2 barabar hai → split → LCA = <b>2</b> ✔.
+
+<b>Complexity:</b> Sirf ek path → O(H) time, iterative isliye O(1) space.`,
+        pitfalls: [
+          "Ye logic sirf <b>BST</b> ke liye hai. Normal binary tree ke liye Q8 wala approach use karo.",
+          "Values compare karo (<code>p.val</code>), node references nahi.",
+          "Jab <code>curr == p</code> ya <code>curr == q</code> ho, tab bhi answer <code>curr</code> hai (else branch me automatically aa jata hai)."
+        ],
+        java: `class Solution {
+    public TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) {
+        TreeNode curr = root;
+
+        while (curr != null) {
+            if (p.val > curr.val && q.val > curr.val) {
+                // p aur q DONO curr se bade -> dono right subtree me hain
+                curr = curr.right;
+            } else if (p.val < curr.val && q.val < curr.val) {
+                // p aur q DONO curr se chhote -> dono left subtree me hain
+                curr = curr.left;
+            } else {
+                // Yahan ya toh:
+                //  - ek chhota aur ek bada hai (raaste yahin se alag hote hain), ya
+                //  - curr.val == p.val ya q.val (node khud ka descendant hota hai)
+                // Dono case me curr hi sabse neeche wala common ancestor hai
+                return curr;
+            }
+        }
+        return null;   // p aur q BST me guaranteed hain, isliye yahan nahi aayenge
+    }
+}`,
+        python: `class Solution:
+    def lowestCommonAncestor(self, root: 'TreeNode', p: 'TreeNode', q: 'TreeNode') -> 'TreeNode':
+        curr = root
+
+        while curr:
+            if p.val > curr.val and q.val > curr.val:
+                # p aur q DONO curr se bade -> dono right subtree me hain
+                curr = curr.right
+            elif p.val < curr.val and q.val < curr.val:
+                # p aur q DONO curr se chhote -> dono left subtree me hain
+                curr = curr.left
+            else:
+                # Yahan ya toh:
+                #  - ek chhota aur ek bada hai (raaste yahin se alag hote hain), ya
+                #  - curr.val == p.val ya q.val (node khud ka descendant hota hai)
+                # Dono case me curr hi sabse neeche wala common ancestor hai
+                return curr
+        return None   # p aur q BST me guaranteed hain, isliye yahan nahi aayenge`
+      },
+      {
+        id: 8, lc: 236, premium: false,
+        title: "Lowest Common Ancestor of a Binary Tree",
+        difficulty: "Medium",
+        pattern: "Bottom-Up Postorder Search",
+        time: "O(N)",
+        space: "O(H)",
+        statement: "Given a binary tree, find the lowest common ancestor (LCA) of two given nodes in the tree.<br>According to the definition of LCA: &ldquo;The lowest common ancestor is defined between two nodes <code>p</code> and <code>q</code> as the lowest node in <code>T</code> that has both <code>p</code> and <code>q</code> as descendants (where we allow <b>a node to be a descendant of itself</b>).&rdquo;",
+        examples: [
+          { input: "root = [3,5,1,6,2,0,8,null,null,7,4], p = 5, q = 1", output: "3", explain: "The LCA of nodes 5 and 1 is 3." },
+          { input: "root = [3,5,1,6,2,0,8,null,null,7,4], p = 5, q = 4", output: "5", explain: "The LCA of nodes 5 and 4 is 5, since a node can be a descendant of itself." },
+          { input: "root = [1,2], p = 1, q = 2", output: "1", explain: "" }
+        ],
+        constraints: [
+          "The number of nodes in the tree is in the range [2, 10^5].",
+          "-10^9 <= Node.val <= 10^9",
+          "All Node.val are unique.",
+          "p != q",
+          "p and q will exist in the tree."
+        ],
+        statementHi: "Ye ek <b>normal binary tree</b> hai (BST nahi!), is wajah se values ki ordering use nahi kar sakte. Do nodes <code>p</code> aur <code>q</code> ka <b>Lowest Common Ancestor</b> dhoondo. Ek node khud ka descendant maana jata hai.",
+        memoryFlow: `leftAns  = LCA(root.left)
+rightAns = LCA(root.right)
+  ├── Left & Right DONO non-null ──► p ek side, q doosri side ──► return ROOT (ye LCA hai)
+  ├── Sirf ek side non-null      ──► wahi (p/q ya LCA) upar bhejo
+  └── Dono null                  ──► return null
+Base: root == null || root == p || root == q ──► return root`,
+        memoryTip: "Normal tree me dono taraf dhoondo. Jahan dono side se non-null mile, wahi LCA hai!",
+        intuition: `<b>Problem:</b> BST nahi hai, isliye 'chhota hai toh left' wali baat kaam nahi karti. Hume poora tree explore karna padega.
+
+<b>Bottom-up (postorder) idea:</b> Har subtree se poochho: "kya tumhare andar p ya q hai?" Jawab me wo ya toh <code>p/q</code> ka node, ya LCA, ya <code>null</code> bhejta hai.
+1. Base case: <code>root == null</code> → null. <code>root == p</code> ya <code>root == q</code> → root return (mil gaya; uske neeche ka kuch dekhne ki zaroorat nahi kyunki node khud ka descendant hota hai).
+2. <code>left = LCA(root.left)</code>, <code>right = LCA(root.right)</code>.
+3. Agar <b>left aur right dono non-null</b> → p aur q alag-alag side me hain → <b>root hi LCA</b>.
+4. Warna jo non-null hai use upar bhejo (ya dono null toh null).
+
+<b>Dry run</b> (<code>[3,5,1,6,2,0,8,...]</code>, p=5, q=1): left(5) → 5 mil gaya, return 5. right(1) → 1 mil gaya, return 1. Dono non-null → return <b>3</b> ✔.
+
+<b>Complexity:</b> Har node ek baar → O(N) time, recursion stack O(H).`,
+        pitfalls: [
+          "Yahan <code>root == p</code> reference compare hai (value nahi) — Python me bhi <code>==</code> object identity par kaam karta hai kyunki TreeNode me <code>__eq__</code> define nahi hai.",
+          "Early return (<code>root == p</code>) sahi hai: agar q p ke neeche ho toh p hi LCA hai.",
+          "Ye solution maanta hai ki p aur q tree me <b>exist</b> karte hain (problem guarantee deti hai)."
+        ],
+        java: `class Solution {
+    public TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) {
+        // Base Case:
+        //  - root == null  -> yahan kuch nahi mila
+        //  - root == p / q -> target mil gaya; ise upar bhej do
+        //    (agar doosra target iske neeche hai toh ye khud hi LCA hoga,
+        //     kyunki ek node khud ka descendant hota hai)
+        if (root == null || root == p || root == q) return root;
+
+        // Left aur Right subtree me p / q / LCA dhoondo
+        TreeNode left = lowestCommonAncestor(root.left, p, q);
+        TreeNode right = lowestCommonAncestor(root.right, p, q);
+
+        // p ek side aur q doosri side mila -> root hi unka sabse neeche wala common ancestor
+        if (left != null && right != null) return root;
+
+        // Sirf ek side me kuch mila -> wahi result upar bhejo
+        // (ya toh dono null -> null, ya wo side jisme p/q/LCA mila)
+        return left != null ? left : right;
+    }
+}`,
+        python: `class Solution:
+    def lowestCommonAncestor(self, root: 'TreeNode', p: 'TreeNode', q: 'TreeNode') -> 'TreeNode':
+        # Base Case:
+        #  - root None  -> yahan kuch nahi mila
+        #  - root p / q -> target mil gaya; ise upar bhej do
+        #    (agar doosra target iske neeche hai toh ye khud hi LCA hoga,
+        #     kyunki ek node khud ka descendant hota hai)
+        if not root or root == p or root == q:
+            return root
+
+        # Left aur Right subtree me p / q / LCA dhoondo
+        left = self.lowestCommonAncestor(root.left, p, q)
+        right = self.lowestCommonAncestor(root.right, p, q)
+
+        # p ek side aur q doosri side mila -> root hi unka sabse neeche wala common ancestor
+        if left and right:
+            return root
+
+        # Sirf ek side me kuch mila -> wahi result upar bhejo
+        # (ya toh dono None -> None, ya wo side jisme p/q/LCA mila)
+        return left if left else right`
+      },
+      {
+        id: 9, lc: 124, premium: false,
+        title: "Binary Tree Maximum Path Sum",
+        difficulty: "Hard",
+        pattern: "Postorder Max Gain (Arch vs Straight Path)",
+        time: "O(N)",
+        space: "O(H)",
+        statement: "A <b>path</b> in a binary tree is a sequence of nodes where each pair of adjacent nodes in the sequence has an edge connecting them. A node can only appear in the sequence <b>at most once</b>. Note that the path does <b>not</b> need to pass through the root.<br>The <b>path sum</b> of a path is the sum of the node's values in the path.<br>Given the <code>root</code> of a binary tree, return <i>the maximum <b>path sum</b> of any <b>non-empty</b> path</i>.",
+        examples: [
+          { input: "root = [1,2,3]", output: "6", explain: "The optimal path is 2 -> 1 -> 3 with a path sum of 2 + 1 + 3 = 6." },
+          { input: "root = [-10,9,20,null,null,15,7]", output: "42", explain: "The optimal path is 15 -> 20 -> 7 with a path sum of 15 + 20 + 7 = 42." }
+        ],
+        constraints: [
+          "The number of nodes in the tree is in the range [1, 3 * 10^4].",
+          "-1000 <= Node.val <= 1000"
+        ],
+        statementHi: "Tree me koi bhi <b>path</b> ek node se shuru hoke kisi bhi node par khatam ho sakta hai (root se hokar jaana zaroori nahi), par ek node ek hi baar aa sakta hai. Path ke nodes ki values ka sum <b>path sum</b> hai. Sabhi <b>non-empty</b> paths me se <b>maximum path sum</b> return karo. Values negative bhi ho sakti hain.",
+        memoryFlow: `Har node par:
+1. leftGain  = max(0, gain(left))     ← negative branch ko ignore (0 le lo)
+   rightGain = max(0, gain(right))
+2. ARCH (curve) path through this node:
+   best = max(best, node.val + leftGain + rightGain)     ← global answer update
+3. Parent ko sirf EK branch de sakte ho (straight):
+   return node.val + max(leftGain, rightGain)`,
+        memoryTip: "Global answer me Left + Root + Right (curve) judta hai, par parent ko sirf ek straight branch return hoti hai!",
+        intuition: `<b>Do alag cheezein samjho:</b>
+• <b>Arch path</b> (is node par 'mudta' hai): <code>left + node + right</code>. Ye path ek hi node par <i>top</i> banata hai, parent tak extend nahi ho sakta. Isse bas <b>global max</b> update hota hai.
+• <b>Straight path</b> (parent ko dene wala): <code>node + max(left, right)</code>. Parent tak sirf ek line jaa sakti hai (path me fork nahi ho sakta).
+
+<b>Step-by-step (postorder):</b>
+1. <code>gain(null) = 0</code>.
+2. <code>leftGain = max(0, gain(left))</code>, <code>rightGain = max(0, gain(right))</code> — negative sum wali branch lena nuksan hai, to use chhod do.
+3. Global update: <code>maxSum = max(maxSum, node.val + leftGain + rightGain)</code>.
+4. Return: <code>node.val + max(leftGain, rightGain)</code>.
+
+<b>Dry run</b> <code>[-10,9,20,null,null,15,7]</code>: 15 → best=15, return 15. 7 → return 7. 20 → 20+15+7=<b>42</b> best, return 35. 9 → return 9. -10 → -10+9+35=34 &lt; 42; return 25. Answer <b>42</b> ✔.
+
+<b>Complexity:</b> O(N) time, O(H) stack.`,
+        pitfalls: [
+          "<code>maxSum</code> ko <code>0</code> se initialise mat karo — saare nodes negative ho sakte hain (answer negative hoga). <code>Integer.MIN_VALUE</code> / <code>-inf</code> use karo.",
+          "Parent ko arch (<code>left + node + right</code>) return karna galat hai — wo fork wala path hai.",
+          "Negative gain ko <code>max(0, ...)</code> se hi neutralize karo; par root ki value negative ho toh bhi path me root hona zaroori hai (non-empty path)."
+        ],
+        java: `class Solution {
+    private int maxSum;   // ab tak ka best path sum (global answer)
+
+    public int maxPathSum(TreeNode root) {
+        maxSum = Integer.MIN_VALUE;   // saare nodes negative ho sakte hain, isliye 0 nahi
+        maxGain(root);
+        return maxSum;
+    }
+
+    // Return karta hai: node se NEECHE ki taraf jaane wala best STRAIGHT path sum
+    // (jo parent ke saath jud sakta hai)
+    private int maxGain(TreeNode node) {
+        // Khali subtree se koi gain nahi
+        if (node == null) return 0;
+
+        // Bachchon se gain lo. Negative gain lena nuksan hai, to max(0, ...) se ignore
+        int left = Math.max(0, maxGain(node.left));
+        int right = Math.max(0, maxGain(node.right));
+
+        // ARCH path: left + node + right. Is node par 'top' banta hai,
+        // isliye ye parent ko nahi ja sakta -> sirf global answer update
+        maxSum = Math.max(maxSum, node.val + left + right);
+
+        // Parent ko sirf ek straight branch de sakte hain -> bada wala chuno
+        return node.val + Math.max(left, right);
+    }
+}`,
+        python: `class Solution:
+    def maxPathSum(self, root: Optional[TreeNode]) -> int:
+        max_sum = float('-inf')   # ab tak ka best path sum (saare nodes negative ho sakte hain)
+
+        # Return karta hai: node se NEECHE ki taraf jaane wala best STRAIGHT path sum
+        # (jo parent ke saath jud sakta hai)
+        def max_gain(node):
+            nonlocal max_sum
+            # Khali subtree se koi gain nahi
+            if not node:
+                return 0
+
+            # Bachchon se gain lo. Negative gain lena nuksan hai, to max(0, ...) se ignore
+            left = max(0, max_gain(node.left))
+            right = max(0, max_gain(node.right))
+
+            # ARCH path: left + node + right. Is node par 'top' banta hai,
+            # isliye ye parent ko nahi ja sakta -> sirf global answer update
+            max_sum = max(max_sum, node.val + left + right)
+
+            # Parent ko sirf ek straight branch de sakte hain -> bada wala chuno
+            return node.val + max(left, right)
+
+        max_gain(root)
+        return int(max_sum)`
+      },
+      {
+        id: 10, lc: 701, premium: false,
+        title: "Insert into a Binary Search Tree",
+        difficulty: "Medium",
+        pattern: "Find Null Spot & Attach Leaf",
+        time: "O(H)",
+        space: "O(H)",
+        statement: "You are given the <code>root</code> node of a binary search tree (BST) and a <code>value</code> to insert into the tree. Return <i>the root node of the BST after the insertion</i>. It is <b>guaranteed</b> that the new value does not exist in the original BST.<br>Notice that there may exist multiple valid ways for the insertion, as long as the tree remains a BST after insertion. You can return <b>any of them</b>.",
+        examples: [
+          { input: "root = [4,2,7,1,3], val = 5", output: "[4,2,7,1,3,5]", explain: "Another accepted answer is [5,2,7,1,3,null,null,null,null,null,4]." },
+          { input: "root = [40,20,60,10,30,50,70], val = 25", output: "[40,20,60,10,30,50,70,null,null,25]", explain: "" },
+          { input: "root = [4,2,7,1,3,null,null,null,null,null,null], val = 5", output: "[4,2,7,1,3,5]", explain: "" }
+        ],
+        constraints: [
+          "The number of nodes in the tree will be in the range [0, 10^4].",
+          "-10^8 <= Node.val <= 10^8",
+          "All the values Node.val are unique.",
+          "-10^8 <= val <= 10^8",
+          "It's guaranteed that val does not exist in the original BST."
+        ],
+        statementHi: "Ek BST aur ek nayi value <code>val</code> di hai. Value ko BST me is tarah insert karo ki tree <b>BST hi rahe</b>, aur final tree ka root return karo. <code>val</code> pehle se tree me nahi hai. Insert karne ke kai valid tareeke ho sakte hain, koi bhi chalega. (Sabse aasaan: naya node <b>leaf</b> bana ke laga do.)",
+        memoryFlow: `root == null     ──► return new TreeNode(val)      (khali jagah mil gayi)
+val < root.val   ──► root.left  = insert(root.left,  val)
+val > root.val   ──► root.right = insert(root.right, val)
+return root      (parent ke saath wapas jodne ke liye)`,
+        memoryTip: "BST me naya node hamesha neeche khali (null) jagah par leaf banke lagta hai!",
+        intuition: `<b>Idea:</b> Search karte jao jaise val ko dhoondh rahe ho. Jab <code>null</code> pe pahunch jao, wahi val ki sahi jagah hai — wahan naya node bana do.
+
+<b>Step-by-step:</b>
+1. <code>root == null</code> → naya <code>TreeNode(val)</code> return (ye parent ka left/right ban jayega).
+2. <code>val &lt; root.val</code> → <code>root.left = insert(root.left, val)</code>.
+3. Warna → <code>root.right = insert(root.right, val)</code>.
+4. <code>root</code> return karo.
+
+<b>Kyun <code>root.left = ...</code> likhte hain?</b> Jab left child null tha toh naya node return hota hai aur assignment se wo parent se jud jata hai; jab left child already tha toh wahi wapas assign ho jata hai (koi change nahi).
+
+<b>Dry run</b> <code>[4,2,7,1,3]</code>, val=5: 4 → 5&gt;4 right (7) → 5&lt;7 left (null) → naya node 5, 7.left = 5 ✔.
+
+<b>Complexity:</b> O(H) time, recursion ki wajah se O(H) space (iterative version O(1) — Home page template #3).`,
+        pitfalls: [
+          "Return value ko assign karna mat bhoolo (<code>root.left = insert(...)</code>); sirf function call karne se link nahi banega.",
+          "Empty tree (<code>root == null</code>) par naya node hi root hota hai.",
+          "Existing node ko restructure/rotate karne ki zaroorat nahi — leaf insert hi sabse simple valid answer hai."
+        ],
+        java: `class Solution {
+    public TreeNode insertIntoBST(TreeNode root, int val) {
+        // Base Case: khali jagah mil gayi (ya tree hi khali tha)
+        // Naya node banao aur return karo -> parent isse apne left/right se jod lega
+        if (root == null) return new TreeNode(val);
+
+        if (val < root.val) {
+            // val chhoti hai -> left subtree me jagah dhoondo
+            // Wahan se jo (updated) subtree aaye use wapas root.left se jod do
+            root.left = insertIntoBST(root.left, val);
+        } else {
+            // val badi hai -> right subtree me jagah dhoondo
+            root.right = insertIntoBST(root.right, val);
+        }
+
+        // Current root ko wapas return karo taaki upar wale parent se link bana rahe
+        return root;
+    }
+}`,
+        python: `class Solution:
+    def insertIntoBST(self, root: Optional[TreeNode], val: int) -> Optional[TreeNode]:
+        # Base Case: khali jagah mil gayi (ya tree hi khali tha)
+        # Naya node banao aur return karo -> parent isse apne left/right se jod lega
+        if not root:
+            return TreeNode(val)
+
+        if val < root.val:
+            # val chhoti hai -> left subtree me jagah dhoondo
+            # Wahan se jo (updated) subtree aaye use wapas root.left se jod do
+            root.left = self.insertIntoBST(root.left, val)
+        else:
+            # val badi hai -> right subtree me jagah dhoondo
+            root.right = self.insertIntoBST(root.right, val)
+
+        # Current root ko wapas return karo taaki upar wale parent se link bana rahe
+        return root`
+      },
+      {
+        id: 11, lc: 450, premium: false,
+        title: "Delete Node in a BST",
+        difficulty: "Medium",
+        pattern: "Search + 3 Deletion Cases (Inorder Successor)",
+        time: "O(H)",
+        space: "O(H)",
+        statement: "Given a root node reference of a BST and a key, delete the node with the given key in the BST. Return <i>the <b>root node reference</b> (possibly updated) of the BST</i>.<br>Basically, the deletion can be divided into two stages:<ol class=\"constraints\"><li>Search for a node to remove.</li><li>If the node is found, delete the node.</li></ol>",
+        examples: [
+          { input: "root = [5,3,6,2,4,null,7], key = 3", output: "[5,4,6,2,null,null,7]", explain: "Given key to delete is 3. So we find the node with value 3 and delete it. One valid answer is [5,4,6,2,null,null,7]. Another valid answer is [5,2,6,null,4,null,7]." },
+          { input: "root = [5,3,6,2,4,null,7], key = 0", output: "[5,3,6,2,4,null,7]", explain: "The tree does not contain a node with value = 0." },
+          { input: "root = [], key = 0", output: "[]", explain: "" }
+        ],
+        constraints: [
+          "The number of nodes in the tree is in the range [0, 10^4].",
+          "-10^5 <= Node.val <= 10^5",
+          "Each node has a unique value.",
+          "root is a valid binary search tree.",
+          "-10^5 <= key <= 10^5",
+          "Follow up: Could you solve it with time complexity O(height of tree)?"
+        ],
+        statementHi: "Ek BST aur ek <code>key</code> di hai. Tree se wo node delete karo jiski value <code>key</code> hai, aur <b>delete ke baad bhi tree BST hi rehna chahiye</b>. Naye tree ka root return karo. Agar key tree me nahi hai toh tree jaisa tha waisa hi rahega.",
+        memoryFlow: `Pehle key dhoondo (key < val → left, key > val → right).  Mil gaya toh:
+  Case 1 (leaf)       : null return
+  Case 2 (ek child)   : doosra child upar utha lo (return that child)
+  Case 3 (2 children) : right subtree ka MINIMUM (inorder successor) dhoondo
+                        → uski value current node me copy
+                        → right subtree se wo minimum node delete`,
+        memoryTip: "2 children wale node ko delete karne par uski jagah Right Subtree ka sabse chhota node leta hai!",
+        intuition: `<b>Delete 2 steps me:</b> (1) node dhoondo, (2) hatao. Hatane ke 3 cases hain:
+1. <b>Leaf</b> (koi child nahi): seedha <code>null</code> return → parent ka pointer null ho jayega.
+2. <b>Ek child</b>: us node ki jagah uska ek child upar aa jata hai (<code>return root.right</code> agar left null, <code>return root.left</code> agar right null). Case 1 bhi isi me aa jata hai (leaf me left null → right return = null).
+3. <b>Do children</b>: Node hatane se BST tootna nahi chahiye. Sahi replacement ya toh <b>inorder successor</b> (right subtree ka minimum) ya <b>inorder predecessor</b> (left subtree ka maximum) hota hai.
+   → <code>succ = min(root.right)</code>, <code>root.val = succ.val</code>, phir <code>root.right = delete(root.right, succ.val)</code>.
+
+<b>Dry run</b> <code>[5,3,6,2,4,null,7]</code>, key=3: 5 → 3&lt;5 left. Node 3 ke 2 children (2,4). Right subtree <code>(4)</code> ka min = 4 → node 3 ki value 4 ban jati hai → right se 4 delete. Result <code>[5,4,6,2,null,null,7]</code> ✔.
+
+<b>Complexity:</b> Search + min dhoondhna + ek aur delete, sab ek hi path par → O(H) time. Recursion stack O(H).`,
+        pitfalls: [
+          "Recursive call ka result wapas assign karo: <code>root.left = deleteNode(root.left, key)</code>.",
+          "2-children case me successor ko <code>root.right</code> se delete karo, pure tree se nahi.",
+          "Empty tree (<code>root == null</code>) ya key na milne par tree unchanged return hota hai."
+        ],
+        java: `class Solution {
+    public TreeNode deleteNode(TreeNode root, int key) {
+        // Key tree me mili hi nahi (ya tree khali tha) -> kuch badalna nahi
+        if (root == null) return null;
+
+        if (key < root.val) {
+            // Key chhoti hai -> left subtree me delete karo, result wapas jodo
+            root.left = deleteNode(root.left, key);
+        } else if (key > root.val) {
+            // Key badi hai -> right subtree me delete karo, result wapas jodo
+            root.right = deleteNode(root.right, key);
+        } else {
+            // ---- Node mil gaya: root.val == key ----
+
+            // Case 1 & 2: left null hai (leaf ya sirf right child)
+            // -> right child (ya null) ko upar utha do
+            if (root.left == null) return root.right;
+
+            // Case 2: right null hai (sirf left child) -> left child ko upar utha do
+            if (root.right == null) return root.left;
+
+            // Case 3: dono children hain
+            // Right subtree ka sabse chhota node (inorder successor) dhoondo
+            TreeNode successor = findMin(root.right);
+
+            // Current node ki value ko successor ki value se badal do
+            root.val = successor.val;
+
+            // Ab right subtree se successor wala original node delete karo
+            // (usme sabse zyada ek hi child (right) hoga -> case 1/2 me aayega)
+            root.right = deleteNode(root.right, successor.val);
+        }
+        return root;
+    }
+
+    // Subtree ka minimum: bas left-left-left chalte jao
+    private TreeNode findMin(TreeNode node) {
+        while (node.left != null) node = node.left;
+        return node;
+    }
+}`,
+        python: `class Solution:
+    def deleteNode(self, root: Optional[TreeNode], key: int) -> Optional[TreeNode]:
+        # Key tree me mili hi nahi (ya tree khali tha) -> kuch badalna nahi
+        if not root:
+            return None
+
+        if key < root.val:
+            # Key chhoti hai -> left subtree me delete karo, result wapas jodo
+            root.left = self.deleteNode(root.left, key)
+        elif key > root.val:
+            # Key badi hai -> right subtree me delete karo, result wapas jodo
+            root.right = self.deleteNode(root.right, key)
+        else:
+            # ---- Node mil gaya: root.val == key ----
+
+            # Case 1 & 2: left None hai (leaf ya sirf right child)
+            # -> right child (ya None) ko upar utha do
+            if not root.left:
+                return root.right
+
+            # Case 2: right None hai (sirf left child) -> left child ko upar utha do
+            if not root.right:
+                return root.left
+
+            # Case 3: dono children hain
+            # Right subtree ka sabse chhota node (inorder successor) dhoondo
+            successor = root.right
+            while successor.left:
+                successor = successor.left
+
+            # Current node ki value ko successor ki value se badal do
+            root.val = successor.val
+
+            # Ab right subtree se successor wala original node delete karo
+            root.right = self.deleteNode(root.right, successor.val)
+        return root`
+      },
+      {
+        id: 12, lc: 285, premium: true,
+        title: "Inorder Successor in BST",
+        difficulty: "Medium",
+        pattern: "Binary Search for Smallest Value > p.val",
+        time: "O(H)",
+        space: "O(1)",
+        statement: "Given the <code>root</code> of a binary search tree and a node <code>p</code> in it, return <i>the in-order successor of that node in the BST</i>. If the given node has no in-order successor in the tree, return <code>null</code>.<br>The successor of a node <code>p</code> is the node with the <b>smallest key greater than</b> <code>p.val</code>.",
+        examples: [
+          { input: "root = [2,1,3], p = 1", output: "2", explain: "1's in-order successor node is 2. Note that both p and the return value is of TreeNode type." },
+          { input: "root = [5,3,6,2,4,null,null,1], p = 6", output: "null", explain: "There is no in-order successor of the current node, so the answer is null." }
+        ],
+        constraints: [
+          "The number of nodes in the tree is in the range [1, 10^4].",
+          "-10^5 <= Node.val <= 10^5",
+          "All Nodes will have unique values."
+        ],
+        statementHi: "BST aur ek node <code>p</code> diya hai. <code>p</code> ka <b>inorder successor</b> return karo — yaani wo node jiski value <code>p.val</code> se <b>strictly badi</b> ho aur saari badi values me <b>sabse chhoti</b> ho (sorted order me p ke just baad wala). Agar nahi hai toh <code>null</code>.",
+        memoryFlow: `curr = root, succ = null
+While curr != null:
+  ├── curr.val >  p.val ──► curr SUCCESSOR ka candidate hai: succ = curr, phir aur chhota dhoondne LEFT jao
+  └── curr.val <= p.val ──► curr aur uska left bekar, RIGHT jao
+Return succ`,
+        memoryTip: "Jab bhi p se bada node mile, use succ me save karo aur aur chhota dhoondne Left jao!",
+        intuition: `<b>Successor = p.val se strictly bada, aur un sab me sabse chhota.</b> BST me ye binary search se mil jata hai, p ke parent pointers ki zaroorat nahi.
+
+<b>Step-by-step:</b>
+1. <code>succ = null</code>, <code>curr = root</code>.
+2. Agar <code>curr.val &gt; p.val</code>: ye ek <b>valid candidate</b> hai (p se bada). Save karo. Par isse chhota candidate left subtree me ho sakta hai → <code>curr = curr.left</code>.
+3. Agar <code>curr.val &lt;= p.val</code>: curr aur uske left ki saari values p se chhoti/barabar → bekar. Successor right me hi hogi → <code>curr = curr.right</code>.
+4. Loop ke baad <code>succ</code> return.
+
+<b>Dry run</b> <code>[5,3,6,2,4,null,null,1]</code>, p=4: 5&gt;4 → succ=5, left(3). 3&le;4 → right(4). 4&le;4 → right(null). Return <b>5</b> ✔ (4 ka koi right child nahi, isliye successor ancestor 5 hai).
+
+<b>Complexity:</b> O(H) time, O(1) space. (Predecessor ke liye bas inequality ulta karo — Home template #4.)`,
+        pitfalls: [
+          "<code>curr.val &lt;= p.val</code> (barabar bhi) → right jao, kyunki successor <b>strictly</b> bada chahiye.",
+          "Yahan <code>p.val</code> se compare hota hai; p ke right subtree ke min wala special case alag se likhne ki zaroorat nahi, ye loop usse bhi handle kar leta hai.",
+          "Sabse bade node ke liye answer <code>null</code> aata hai (koi bada hai hi nahi)."
+        ],
+        java: `class Solution {
+    public TreeNode inorderSuccessor(TreeNode root, TreeNode p) {
+        TreeNode successor = null;   // ab tak ka best candidate (p se bada, par sabse chhota)
+
+        while (root != null) {
+            if (root.val > p.val) {
+                // root p se bada hai -> successor ka candidate ho sakta hai. Save karo.
+                successor = root;
+                // Isse bhi chhota (par p se bada) left subtree me ho sakta hai
+                root = root.left;
+            } else {
+                // root.val <= p.val: root aur uska left bekar (sab p se chhote/barabar)
+                // Successor right subtree me hi milega
+                root = root.right;
+            }
+        }
+        return successor;   // null agar p sabse bada node hai
+    }
+}`,
+        python: `class Solution:
+    def inorderSuccessor(self, root: 'TreeNode', p: 'TreeNode') -> Optional['TreeNode']:
+        successor = None   # ab tak ka best candidate (p se bada, par sabse chhota)
+
+        while root:
+            if root.val > p.val:
+                # root p se bada hai -> successor ka candidate ho sakta hai. Save karo.
+                successor = root
+                # Isse bhi chhota (par p se bada) left subtree me ho sakta hai
+                root = root.left
+            else:
+                # root.val <= p.val: root aur uska left bekar (sab p se chhote/barabar)
+                # Successor right subtree me hi milega
+                root = root.right
+        return successor   # None agar p sabse bada node hai`
+      },
+      {
+        id: 13, lc: 776, premium: true,
+        title: "Split BST",
+        difficulty: "Medium",
+        pattern: "Recursive Pair Return {SmallTree, LargeTree}",
+        time: "O(H)",
+        space: "O(H)",
+        statement: "Given the <code>root</code> of a binary search tree (BST) and an integer <code>target</code>, split the tree into two subtrees where one subtree has nodes that are all <b>smaller or equal</b> to the target value, while the other subtree has all nodes that are <b>greater</b> than the target value. It is not necessarily the case that the tree contains a node with the value <code>target</code>.<br>Additionally, most of the structure of the original tree should remain. Formally, for any child <code>c</code> with parent <code>p</code> in the original tree, if they are both in the same subtree after the split, then node <code>c</code> should still have the parent <code>p</code>.<br>Return <i>an array of the two roots of the two subtrees in order</i>.",
+        examples: [
+          { input: "root = [4,2,6,1,3,5,7], target = 2", output: "[[2,1],[4,3,6,null,null,5,7]]", explain: "" },
+          { input: "root = [1], target = 1", output: "[[1],[]]", explain: "" }
+        ],
+        constraints: [
+          "The number of nodes in the tree is in the range [1, 50].",
+          "0 <= Node.val, target <= 1000"
+        ],
+        statementHi: "BST aur ek <code>target</code> diya hai. Tree ko <b>do BSTs</b> me todo: ek me saari values <code>&lt;= target</code>, doosre me saari values <code>&gt; target</code>. Target tree me ho, zaroori nahi. Original structure jitna ho sake <b>waisa hi rehna chahiye</b> (agar parent-child dono ek hi part me hain toh unka relation nahi tootna chahiye). Dono trees ke roots <code>[small, large]</code> order me return karo.",
+        memoryFlow: `split(root, target) → [smallTree, largeTree]
+
+root.val <= target ──► root + uska LEFT sab small me jayenge
+    [s, l] = split(root.right)
+    root.right = s            (right ka small hissa root se jodo)
+    return [root, l]
+
+root.val >  target ──► root + uska RIGHT sab large me jayenge
+    [s, l] = split(root.left)
+    root.left = l             (left ka large hissa root se jodo)
+    return [s, root]`,
+        memoryTip: "root <= target ho toh RIGHT subtree split karo, warna LEFT subtree split karo!",
+        intuition: `<b>Sochne ka tareeka:</b> Har node ya toh "small" tree me jayega ya "large" tree me. Sirf ek hi side ko aur todna padta hai.
+
+<b>Case A: <code>root.val &lt;= target</code></b>
+→ root aur uska poora <b>left</b> subtree small me jayenge (left ki sab values root se chhoti). Todna sirf <b>right</b> subtree ko hai: <code>[s, l] = split(root.right)</code>. Right ka <b>small hissa</b> <code>s</code> root ke right me jodo (<code>root.right = s</code>). Return <code>[root, l]</code>.
+
+<b>Case B: <code>root.val &gt; target</code></b>
+→ root aur uska poora <b>right</b> subtree large me. Todna sirf <b>left</b> ko hai: <code>[s, l] = split(root.left)</code>. Left ka <b>large hissa</b> <code>l</code> root ke left me jodo (<code>root.left = l</code>). Return <code>[s, root]</code>.
+
+<b>Base case:</b> <code>null</code> → <code>[null, null]</code>.
+
+<b>Dry run</b> <code>[4,2,6,1,3,5,7]</code>, target=2: 4&gt;2 → split(2): 2&le;2 → split(3): 3&gt;2 → split(null)=[null,null]; 3.left=null; return [null,3]. Wapas 2 par: 2.right = null; return [2, 3]. Wapas 4 par: 4.left = 3; return [2, 4]. Small=<code>[2,1]</code>, Large=<code>[4,3,6,null,null,5,7]</code> ✔.
+
+<b>Complexity:</b> Sirf ek root-to-leaf path par kaam → O(H) time, O(H) stack.`,
+        pitfalls: [
+          "Python me <b>return [root, large]</b> hona chahiye (small nahi!) jab <code>root.val &lt;= target</code>. Pichhle version me ye bug tha — ab fix hai.",
+          "<code>&lt;=</code> target small tree me jata hai, <code>&gt;</code> large me — equality ko galat side na do.",
+          "Dono cases me wapas jodte waqt <b>doosre taraf ka hissa</b> use karo: Case A me <code>root.right = small</code>, Case B me <code>root.left = large</code>."
+        ],
+        java: `class Solution {
+    // Return: arr[0] = saari values <= target wala tree, arr[1] = saari values > target wala tree
+    public TreeNode[] splitBST(TreeNode root, int target) {
+        // Base Case: khali tree ko todne par dono parts khali
+        if (root == null) return new TreeNode[]{null, null};
+
+        if (root.val <= target) {
+            // root (aur uska poora left subtree) SMALL part me jayega.
+            // Sirf right subtree ko todna hai.
+            TreeNode[] res = splitBST(root.right, target);
+
+            // Right subtree ka small part root ke right me jod do
+            root.right = res[0];
+
+            // Small tree ka root = root;  Large tree = right subtree ka large part
+            return new TreeNode[]{root, res[1]};
+        } else {
+            // root (aur uska poora right subtree) LARGE part me jayega.
+            // Sirf left subtree ko todna hai.
+            TreeNode[] res = splitBST(root.left, target);
+
+            // Left subtree ka large part root ke left me jod do
+            root.left = res[1];
+
+            // Small tree = left subtree ka small part;  Large tree ka root = root
+            return new TreeNode[]{res[0], root};
+        }
+    }
+}`,
+        python: `class Solution:
+    # Return: [small_tree, large_tree]
+    #   small_tree = saari values <= target, large_tree = saari values > target
+    def splitBST(self, root: Optional[TreeNode], target: int) -> List[Optional[TreeNode]]:
+        # Base Case: khali tree ko todne par dono parts khali
+        if not root:
+            return [None, None]
+
+        if root.val <= target:
+            # root (aur uska poora left subtree) SMALL part me jayega.
+            # Sirf right subtree ko todna hai.
+            small, large = self.splitBST(root.right, target)
+
+            # Right subtree ka small part root ke right me jod do
+            root.right = small
+
+            # Small tree ka root = root;  Large tree = right subtree ka large part
+            return [root, large]
+        else:
+            # root (aur uska poora right subtree) LARGE part me jayega.
+            # Sirf left subtree ko todna hai.
+            small, large = self.splitBST(root.left, target)
+
+            # Left subtree ka large part root ke left me jod do
+            root.left = large
+
+            # Small tree = left subtree ka small part;  Large tree ka root = root
+            return [small, root]`
+      },
+      {
+        id: 14, lc: 255, premium: true,
+        title: "Verify Preorder Sequence in Binary Search Tree",
+        difficulty: "Medium",
+        pattern: "Monotonic Stack + Lower Bound",
+        time: "O(N)",
+        space: "O(1) in-place (Java) / O(N) (Python)",
+        statement: "Given an array of <b>unique</b> integers <code>preorder</code>, return <code>true</code> <i>if it is the correct preorder traversal sequence of a binary search tree</i>.",
+        examples: [
+          { input: "preorder = [5,2,1,3,6]", output: "true", explain: "" },
+          { input: "preorder = [5,2,6,1,3]", output: "false", explain: "" }
+        ],
+        constraints: [
+          "1 <= preorder.length <= 10^4",
+          "1 <= preorder[i] <= 10^4",
+          "All the elements of preorder are unique.",
+          "Follow up: Could you do it using only constant space complexity?"
+        ],
+        statementHi: "Ek array <code>preorder</code> diya hai (saari values unique). Batao ki kya ye kisi <b>BST ka valid preorder traversal</b> ho sakta hai? (Preorder = Root, Left, Right.) <i>Follow-up:</i> sirf O(1) extra space me karo (input array ko hi stack bana lo).",
+        memoryFlow: `Preorder: Root → (chhoti values: LEFT) → (badi values: RIGHT)
+
+Stack me decreasing chain rakho (left spine).
+Naya val aaye:
+  ├── val < lowerBound         ──► INVALID (right subtree me jaane ke baad ancestor se chhota nahi aa sakta)
+  ├── val > stack.top          ──► pop karo jab tak top < val ; last popped = lowerBound
+  └── push val`,
+        memoryTip: "Ek baar right subtree me enter ho gaye (kisi ko pop kiya), toh us parent (lowerBound) se chhoti value kabhi nahi aa sakti!",
+        intuition: `<b>Preorder ki shape:</b> Root pehle, phir uske left subtree ki saari (chhoti) values, phir right subtree ki saari (badi) values.
+
+<b>Stack ka matlab:</b> Stack me un ancestors ki chain hai jinke <b>left subtree</b> me abhi hum ghoom rahe hain (values decreasing).
+<b>lowerBound:</b> Jab hum kisi node ke <b>right</b> subtree me ghus jaate hain, us node (aur uske baad ke sab ancestors jinhe pop kiya) se <b>chhoti value kabhi nahi aa sakti</b>.
+
+<b>Step-by-step:</b>
+1. <code>lowerBound = -∞</code>, stack empty.
+2. Har <code>val</code> ke liye: agar <code>val &lt; lowerBound</code> → <b>false</b>.
+3. Jab tak stack ka top <code>&lt; val</code>: pop karo aur <code>lowerBound = popped</code> (hum us ancestor ke right subtree me chale gaye).
+4. <code>val</code> ko push karo.
+5. Aakhir tak koi violation nahi → <b>true</b>.
+
+<b>Dry run</b> <code>[5,2,6,1,3]</code>: 5 push. 2 push. 6: pop 2 (lb=2), pop 5 (lb=5), push 6. 1: 1 &lt; lb(5) → <b>false</b> ✔.
+<code>[5,2,1,3,6]</code>: 5,2,1 push. 3: pop 1 (lb=1), pop 2 (lb=2), push 3 (stack 5,3). 6: pop 3 (lb=3), pop 5 (lb=5), push 6 → <b>true</b> ✔.
+
+<b>Complexity:</b> Har element ek baar push/pop → O(N). Java version input array ko hi stack banata hai (O(1) extra) — par input modify hota hai.`,
+        pitfalls: [
+          "Java version <code>preorder</code> array ko <b>overwrite</b> karta hai (follow-up ke liye). Agar input badalna allowed nahi, toh alag stack use karo (Python version jaisa).",
+          "<code>lowerBound</code> hamesha badhta hi hai (jo pop hota hai wo purane lowerBound se bada hota hai).",
+          "Condition <code>val &gt; stack.top</code> (strict) — values unique hain, isliye equality ka case nahi aata."
+        ],
+        java: `class Solution {
+    public boolean verifyPreorder(int[] preorder) {
+        // lowerBound: abhi tak jis ancestor ke RIGHT subtree me aa chuke hain, uski value.
+        // Ab se koi bhi value is se chhoti aayi toh sequence invalid.
+        int lowerBound = Integer.MIN_VALUE;
+
+        // 'top' stack ka top index. Hum input array ke shuruaati hisse ko hi stack bana rahe hain
+        // (follow-up: O(1) extra space). Dhyan: ye input array ko modify karta hai.
+        int top = -1;
+
+        for (int val : preorder) {
+            // Right subtree me aa chuke hain; us ancestor se chhoti value ban hi nahi sakti
+            if (val < lowerBound) return false;
+
+            // Agar val stack ke top se bada hai, toh hum un nodes ke RIGHT subtree me chale gaye.
+            // Un nodes ko pop karte jao; sabse aakhri popped value naya lowerBound.
+            while (top >= 0 && val > preorder[top]) {
+                lowerBound = preorder[top];
+                top--;
+            }
+
+            // val ab stack ke top par aa jata hai (decreasing chain bani rehti hai)
+            top++;
+            preorder[top] = val;
+        }
+        return true;   // koi violation nahi mila
+    }
+}`,
+        python: `class Solution:
+    def verifyPreorder(self, preorder: List[int]) -> bool:
+        # stack: un ancestors ki chain jinke LEFT subtree me abhi ghoom rahe hain (decreasing)
+        stack = []
+        # lower_bound: jis ancestor ke RIGHT subtree me aa chuke hain, uski value.
+        # Ab se koi bhi value is se chhoti aayi toh sequence invalid.
+        lower_bound = float('-inf')
+
+        for val in preorder:
+            # Right subtree me aa chuke hain; us ancestor se chhoti value ban hi nahi sakti
+            if val < lower_bound:
+                return False
+
+            # Agar val stack ke top se bada hai, toh hum un nodes ke RIGHT subtree me chale gaye.
+            # Un nodes ko pop karo; sabse aakhri popped value naya lower_bound.
+            while stack and val > stack[-1]:
+                lower_bound = stack.pop()
+
+            # val ko stack me daalo (decreasing chain bani rehti hai)
+            stack.append(val)
+
+        return True   # koi violation nahi mila`
+      },
+      {
+        id: 15, lc: 1214, premium: true,
+        title: "Two Sum BSTs",
+        difficulty: "Medium",
+        pattern: "HashSet Lookup Across Two Trees",
+        time: "O(N + M)",
+        space: "O(N)",
+        statement: "Given the roots of two binary search trees, <code>root1</code> and <code>root2</code>, return <code>true</code> if and only if there is a node in the first tree and a node in the second tree whose values sum up to a given integer <code>target</code>.",
+        examples: [
+          { input: "root1 = [2,1,4], root2 = [1,0,3], target = 5", output: "true", explain: "2 and 3 sum up to 5." },
+          { input: "root1 = [0,-10,10], root2 = [5,1,7,0,2], target = 18", output: "false", explain: "" }
+        ],
+        constraints: [
+          "The number of nodes in each tree is in the range [1, 5000].",
+          "-10^9 <= Node.val, target <= 10^9"
+        ],
+        statementHi: "Do alag BSTs <code>root1</code> aur <code>root2</code> diye hain. Kya <b>pehle tree ka ek node</b> aur <b>doosre tree ka ek node</b> aisa hai jinki values ka sum <code>target</code> ke barabar ho? Haan toh <code>true</code>, warna <code>false</code>.",
+        memoryFlow: `Step 1: Tree 1 ke SAARE values ──► HashSet me daalo
+Step 2: Tree 2 ke har node x ke liye:
+          (target - x) HashSet me hai ? ──► return true
+Koi nahi mila ──► return false`,
+        memoryTip: "Pehle tree ko set me dalo, doosre tree me har node ke liye (target - val) set me dhoondo!",
+        intuition: `<b>Ye classic Two Sum hai</b>, bas array ki jagah do trees hain.
+
+<b>Step-by-step:</b>
+1. Tree 1 ko traverse karke saari values ek <code>HashSet</code> me daalo.
+2. Tree 2 ko traverse karo. Har node <code>x</code> par check karo: <code>target - x</code> set me hai?
+3. Mil jaye toh turant <code>true</code> (early exit). Poora traverse ho jaye toh <code>false</code>.
+
+<b>Dry run</b> (<code>[2,1,4]</code>, <code>[1,0,3]</code>, target=5): set={2,1,4}. Tree2: node 1 → 5-1=4 set me hai ✔ → <b>true</b>.
+
+<b>Complexity:</b> O(N + M) time, O(N) set space + O(H) stack.
+
+<b>Space-optimised alternatives (interview follow-up):</b>
+• Tree 1 ke har node ke liye tree 2 me <b>BST search</b> (<code>target - x</code>) → O(N·H₂) time, O(1) extra space.
+• Ya tree 1 ka <b>forward inorder iterator</b> aur tree 2 ka <b>reverse inorder iterator</b> se two-pointer → O(N+M) time, O(H₁+H₂) space.`,
+        pitfalls: [
+          "Complement <code>target - x</code> nikaalo, <code>x - target</code> nahi.",
+          "Values ±10<sup>9</sup> tak ho sakti hain; <code>target - x</code> int range ke andar hi rehta hai is problem me, par bade constraints me <code>long</code> use karna safe hai.",
+          "Dono trees alag hain — ek hi tree ke andar ka pair valid nahi hai."
+        ],
+        java: `class Solution {
+    public boolean twoSumBSTs(TreeNode root1, TreeNode root2, int target) {
+        // Step 1: Tree 1 ki saari values HashSet me daalo (O(1) lookup ke liye)
+        Set<Integer> set = new HashSet<>();
+        fill(root1, set);
+
+        // Step 2: Tree 2 me har node ke liye complement (target - val) set me dhoondo
+        return find(root2, set, target);
+    }
+
+    // Tree ko traverse karke saari values set me daalta hai
+    private void fill(TreeNode node, Set<Integer> set) {
+        if (node == null) return;
+        set.add(node.val);
+        fill(node.left, set);
+        fill(node.right, set);
+    }
+
+    // Tree 2 me aisa node dhoondo jiska complement tree 1 ke set me ho
+    private boolean find(TreeNode node, Set<Integer> set, int target) {
+        if (node == null) return false;
+
+        // Complement mil gaya -> pair ban gaya, turant true
+        if (set.contains(target - node.val)) return true;
+
+        // Warna left ya right me se kahin bhi mil jaye toh true (|| se early exit)
+        return find(node.left, set, target) || find(node.right, set, target);
+    }
+}`,
+        python: `class Solution:
+    def twoSumBSTs(self, root1: Optional[TreeNode], root2: Optional[TreeNode], target: int) -> bool:
+        seen = set()   # Tree 1 ki saari values (O(1) lookup ke liye)
+
+        # Step 1: Tree 1 ki saari values set me daalo
+        def fill(node):
+            if not node:
+                return
+            seen.add(node.val)
+            fill(node.left)
+            fill(node.right)
+
+        # Step 2: Tree 2 me aisa node dhoondo jiska complement (target - val) set me ho
+        def find(node):
+            if not node:
+                return False
+
+            # Complement mil gaya -> pair ban gaya, turant True
+            if target - node.val in seen:
+                return True
+
+            # Warna left ya right me se kahin bhi mil jaye toh True (or se early exit)
+            return find(node.left) or find(node.right)
+
+        fill(root1)
+        return find(root2)`
+      },
+      {
+        id: 16, lc: 333, premium: true,
+        title: "Largest BST Subtree",
+        difficulty: "Medium",
+        pattern: "Bottom-Up Postorder Tuple {min, max, size}",
+        time: "O(N)",
+        space: "O(H)",
+        statement: "Given the root of a binary tree, find the largest subtree, which is also a Binary Search Tree (BST), where the largest means subtree has the largest number of nodes.<br>A <b>Binary Search Tree (BST)</b> is a tree in which all the nodes follow the below-mentioned properties:<ul class=\"constraints\"><li>The left subtree values are less than the value of their parent (root) node's value.</li><li>The right subtree values are greater than the value of their parent (root) node's value.</li></ul><b>Note:</b> A subtree must include all of its descendants.<br><b>Follow up:</b> Can you figure out ways to solve it with <code>O(n)</code> time complexity?",
+        examples: [
+          { input: "root = [10,5,15,1,8,null,7]", output: "3", explain: "The Largest BST Subtree in this case is the highlighted one [5,1,8]. The return value is the subtree's size, which is 3." },
+          { input: "root = [4,2,7,2,3,5,null,2,null,null,null,null,null,1]", output: "2", explain: "" }
+        ],
+        constraints: [
+          "The number of nodes in the tree is in the range [0, 10^4].",
+          "-10^4 <= Node.val <= 10^4"
+        ],
+        statementHi: "Ek <b>normal binary tree</b> diya hai. Uske andar wo <b>sabse bada subtree</b> dhoondo jo khud ek <b>valid BST</b> ho. 'Bada' matlab jisme <b>sabse zyada nodes</b> hon. Return karna hai us BST subtree ka <b>size (node count)</b>. Subtree me uske <b>saare descendants</b> hone chahiye (beech se kaat nahi sakte).",
+        memoryFlow: `Postorder (bachche pehle): har node bachon se {min, max, size} leta hai
+
+Valid BST ⟺  left.max < node.val < right.min
+  ├── YES ──► return {min(node.val, left.min), max(node.val, right.max), left.size + right.size + 1}
+  └── NO  ──► return {-∞, +∞, max(left.size, right.size)}   ← "invalid" sentinel
+Null node: {+∞, -∞, 0}   (har comparison pass ho jaye)`,
+        memoryTip: "Postorder me bachchon se (min, max, size) lo. Left.max < node < Right.min ho toh BST, warna invalid sentinel (-∞, +∞) upar bhejo!",
+        intuition: `<b>Brute force:</b> har node ko root maanke isValidBST chalao → O(N²). 
+
+<b>Optimised (bottom-up):</b> Postorder me har subtree apne baare me 3 info bhejta hai: <code>min</code>, <code>max</code> (values ki range) aur <code>size</code> (agar wo BST hai).
+
+<b>Step-by-step:</b>
+1. <code>null</code> → <code>{min=+∞, max=-∞, size=0}</code> (aisa ki null subtree har comparison pass kar jaye).
+2. Left aur right se tuples lo (recursion).
+3. Check: <code>left.max &lt; node.val &lt; right.min</code> → current subtree BST hai: <code>min = min(node.val, left.min)</code>, <code>max = max(node.val, right.max)</code>, <code>size = left.size + right.size + 1</code>.
+4. Nahi toh current BST nahi hai → <b>invalid sentinel</b> <code>{min=-∞, max=+∞}</code> bhejo (jisse ancestors bhi apne aap invalid ho jayein) aur <code>size = max(left.size, right.size)</code> (ab tak ka best).
+5. Root ke tuple ka <code>size</code> final answer.
+
+<b>Dry run</b> <code>[10,5,15,1,8,null,7]</code>: 1 → {1,1,1}. 8 → {8,8,1}. 5 → 1&lt;5&lt;8 ✔ → {1,8,3}. 7 → {7,7,1}. 15 → left null, right min=7: 15 &lt; 7 ✘ → invalid, size=max(0,1)=1. 10 → right invalid ✘ → size = max(3,1) = <b>3</b> ✔.
+
+<b>Complexity:</b> Har node ek baar → O(N). Stack O(H).`,
+        pitfalls: [
+          "Invalid subtree ke liye sentinel <code>{-∞, +∞}</code> hona zaroori hai taaki parent ka check <b>hamesha fail</b> ho (kisi bhi value ke liye).",
+          "Null ke liye <code>min=+∞, max=-∞</code> (ulta!) — taaki leaf node ke liye <code>left.max &lt; val &lt; right.min</code> automatically true ho.",
+          "Duplicate values BST me allowed nahi — isliye strict &lt; use hota hai."
+        ],
+        java: `class Solution {
+    public int largestBSTSubtree(TreeNode root) {
+        // postorder(root) = {min, max, size}; humein bas size chahiye (index 2)
+        return postorder(root)[2];
+    }
+
+    // Return: int[]{ subtree ki min value, max value, largest BST ka size }
+    private int[] postorder(TreeNode node) {
+        // Null subtree: valid BST ka size 0.
+        // min = +inf, max = -inf rakha taaki leaf ke liye (left.max < val < right.min) true ho
+        if (node == null) return new int[]{Integer.MAX_VALUE, Integer.MIN_VALUE, 0};
+
+        // Pehle bachchon se info lo (postorder: left, right, phir node)
+        int[] left = postorder(node.left);
+        int[] right = postorder(node.right);
+
+        // BST condition: left ka max < node < right ka min
+        if (node.val > left[1] && node.val < right[0]) {
+            // Poora subtree BST hai! Nayi range aur size bana ke return
+            return new int[]{
+                Math.min(node.val, left[0]),     // is subtree ka min
+                Math.max(node.val, right[1]),    // is subtree ka max
+                left[2] + right[2] + 1           // dono bachchon ka size + khud
+            };
+        }
+
+        // Yahan BST nahi bana. Invalid sentinel (-inf, +inf) bhejo taaki
+        // parent bhi kabhi BST na ban sake; size me ab tak ka best rakho
+        return new int[]{Integer.MIN_VALUE, Integer.MAX_VALUE, Math.max(left[2], right[2])};
+    }
+}`,
+        python: `class Solution:
+    def largestBSTSubtree(self, root: Optional[TreeNode]) -> int:
+        # Return: (subtree ki min value, max value, largest BST ka size)
+        def postorder(node):
+            # Null subtree: valid BST ka size 0.
+            # min = +inf, max = -inf rakha taaki leaf ke liye (l_max < val < r_min) true ho
+            if not node:
+                return (float('inf'), float('-inf'), 0)
+
+            # Pehle bachchon se info lo (postorder: left, right, phir node)
+            l_min, l_max, l_size = postorder(node.left)
+            r_min, r_max, r_size = postorder(node.right)
+
+            # BST condition: left ka max < node < right ka min
+            if l_max < node.val < r_min:
+                # Poora subtree BST hai! Nayi range aur size bana ke return
+                return (min(node.val, l_min),      # is subtree ka min
+                        max(node.val, r_max),      # is subtree ka max
+                        l_size + r_size + 1)       # dono bachchon ka size + khud
+
+            # Yahan BST nahi bana. Invalid sentinel (-inf, +inf) bhejo taaki
+            # parent bhi kabhi BST na ban sake; size me ab tak ka best rakho
+            return (float('-inf'), float('inf'), max(l_size, r_size))
+
+        # Tuple ka aakhri element (size) hi answer hai
+        return postorder(root)[2]`
+      },
+      {
+        id: 17, lc: 1902, premium: true,
+        title: "Depth of BST Given Insertion Order",
+        difficulty: "Medium",
+        pattern: "Floor & Ceiling Depth Lookup (TreeMap / Sorted List)",
+        time: "O(N log N)",
+        space: "O(N)",
+        statement: "You are given a <b>0-indexed</b> integer array <code>order</code> of length <code>n</code>, a <b>permutation</b> of integers from <code>1</code> to <code>n</code> representing the <b>order</b> of insertion into a <b>binary search tree</b>.<br>A binary search tree is defined as follows:<ul class=\"constraints\"><li>The left subtree of a node contains only nodes with keys <b>less than</b> the node's key.</li><li>The right subtree of a node contains only nodes with keys <b>greater than</b> the node's key.</li><li>Both the left and right subtrees must also be binary search trees.</li></ul>The binary search tree is constructed as follows:<ul class=\"constraints\"><li><code>order[0]</code> will be the <b>root</b> of the binary search tree.</li><li>All subsequent elements are inserted as the <b>child</b> of <b>any</b> existing node such that the binary search tree properties hold.</li></ul>Return <i>the <b>depth</b> of the binary search tree</i>.<br>A binary tree's <b>depth</b> is the number of <b>nodes</b> along the <b>longest path</b> from the root node down to the farthest leaf node.",
+        examples: [
+          { input: "order = [2,1,3,4]", output: "3", explain: "The binary search tree has a depth of 3 with path 2->3->4." },
+          { input: "order = [2,1,4,3]", output: "3", explain: "The binary search tree has a depth of 3 with path 2->4->3." },
+          { input: "order = [1,2,3,4]", output: "4", explain: "The binary search tree has a depth of 4 with path 1->2->3->4." }
+        ],
+        constraints: [
+          "n == order.length",
+          "1 <= n <= 10^5",
+          "order is a permutation of integers between 1 and n."
+        ],
+        statementHi: "Ek array <code>order</code> diya hai jo numbers <code>1..n</code> ka <b>permutation</b> hai aur ye us <b>sequence</b> ko dikhata hai jisme values ek khali BST me insert hui (<code>order[0]</code> root hai). Tree <b>actually banaye bina</b> BST ki <b>depth</b> (root se sabse door leaf tak ke nodes ki ginti) batao.",
+        memoryFlow: `Har naya x insert hone par, ab tak insert hui values me se:
+  floor   = x se chhoti wali me SABSE BADI    (predecessor)
+  ceiling = x se badi wali me SABSE CHHOTI    (successor)
+Inme se jo GEHRA hai wahi x ka PARENT banta hai:
+  depth[x] = max(depth[floor], depth[ceiling]) + 1
+Answer = max depth[x]`,
+        memoryTip: "Naya element apne floor aur ceiling me se jiski depth zyada ho, usi ka child banta hai (depth + 1)!",
+        intuition: `<b>Direct simulation:</b> tree banao aur har insert O(H) → worst case O(N²) (sorted order me chain). Bahut slow ho sakta hai.
+
+<b>Smart observation:</b> Naya x insert hone par, ab tak ki values me uska <b>predecessor</b> (floor: sabse bada jo x se chhota) aur <b>successor</b> (ceiling: sabse chhota jo x se bada) hote hain. In dono me se <b>ek doosre ka ancestor</b> hota hai (jo baad me insert hua, wo neeche hai). Naya node unme se <b>gehre wale ka hi child</b> banta hai.
+
+<b>Step-by-step:</b>
+1. Ek sorted map rakho: <code>value → depth</code> (Java: <code>TreeMap</code>).
+2. Har <code>x</code> ke liye <code>floorEntry(x)</code> aur <code>ceilingEntry(x)</code> nikalo.
+3. <code>depth[x] = max(depth[floor], depth[ceiling]) + 1</code> (jo exist na kare use 0 maano; pehle element ke liye depth = 1).
+4. Map me <code>x → depth</code> daalo, <code>maxDepth</code> update karo.
+
+<b>Dry run</b> <code>[2,1,4,3]</code>: 2→1. 1: ceiling 2(1) → 2. 4: floor 2(1) → 2. 3: floor 2(1), ceiling 4(2) → max=2 → 3. Max = <b>3</b> ✔.
+
+<b>Complexity:</b> Har insert O(log N) (TreeMap) → O(N log N). Python me sorted list me <code>insert</code> O(N) (memmove, practical me fast) → worst O(N²), par 10⁵ par theek chal jata hai.`,
+        pitfalls: [
+          "Floor/ceiling me se <b>max depth</b> lo, min nahi — naya node gehre wale ka child banta hai.",
+          "Pehle element par floor aur ceiling dono nahi hote → depth = 0 + 1 = 1.",
+          "Python: <code>bisect_left</code> se index nikalo; <code>keys[idx-1]</code> = floor, <code>keys[idx]</code> = ceiling (x abhi list me nahi hai)."
+        ],
+        java: `class Solution {
+    public int maxDepthBST(int[] order) {
+        // TreeMap: value -> uski depth. Keys hamesha sorted rehti hain,
+        // jisse floorEntry / ceilingEntry O(log N) me mil jate hain.
+        TreeMap<Integer, Integer> map = new TreeMap<>();
+        int maxDepth = 0;
+
+        for (int x : order) {
+            // x se chhoti values me sabse badi (predecessor) aur
+            // x se badi values me sabse chhoti (successor)
+            Map.Entry<Integer, Integer> smaller = map.floorEntry(x);
+            Map.Entry<Integer, Integer> larger = map.ceilingEntry(x);
+
+            // x in dono me se jo GEHRA hai uska child banega
+            int parentDepth = 0;   // koi nahi hai (pehla element) -> 0
+            if (smaller != null) parentDepth = Math.max(parentDepth, smaller.getValue());
+            if (larger != null) parentDepth = Math.max(parentDepth, larger.getValue());
+
+            int depth = parentDepth + 1;   // x ki apni depth
+            map.put(x, depth);             // aage ke elements ke liye save
+            maxDepth = Math.max(maxDepth, depth);
+        }
+        return maxDepth;
+    }
+}`,
+        python: `import bisect
+
+class Solution:
+    def maxDepthBST(self, order: List[int]) -> int:
+        keys = []        # ab tak insert hui values, hamesha SORTED
+        depths = {}      # value -> uski depth
+        max_depth = 0
+
+        for x in order:
+            # idx = jahan x sorted list me aayega
+            # keys[idx - 1] = x se chhoti values me sabse badi (floor / predecessor)
+            # keys[idx]     = x se badi values me sabse chhoti (ceiling / successor)
+            idx = bisect.bisect_left(keys, x)
+
+            # x in dono me se jo GEHRA hai uska child banega
+            parent_depth = 0                      # koi nahi hai (pehla element) -> 0
+            if idx > 0:
+                parent_depth = max(parent_depth, depths[keys[idx - 1]])
+            if idx < len(keys):
+                parent_depth = max(parent_depth, depths[keys[idx]])
+
+            depth = parent_depth + 1              # x ki apni depth
+            depths[x] = depth
+            keys.insert(idx, x)                   # sorted order maintain rakhte hue insert
+            max_depth = max(max_depth, depth)
+
+        return max_depth`
+      },
+      {
+        id: 18, lc: 1586, premium: true,
+        title: "Binary Search Tree Iterator II",
+        difficulty: "Medium",
+        pattern: "Flatten Inorder List + Index Pointer",
+        time: "O(N) build, O(1) per op",
+        space: "O(N)",
+        statement: "Implement the <code>BSTIterator</code> class that represents an iterator over the <b>in-order traversal</b> of a binary search tree (BST):<ul class=\"constraints\"><li><code>BSTIterator(TreeNode root)</code> Initializes an object of the <code>BSTIterator</code> class. The <code>root</code> of the BST is given as part of the constructor. The pointer should be initialized to a non-existent number <b>smaller</b> than any element in the BST.</li><li><code>boolean hasNext()</code> Returns <code>true</code> if there exists a number in the traversal to the right of the pointer, otherwise returns <code>false</code>.</li><li><code>int next()</code> Moves the pointer to the right, then returns the number at the pointer.</li><li><code>boolean hasPrev()</code> Returns <code>true</code> if there exists a number in the traversal to the left of the pointer, otherwise returns <code>false</code>.</li><li><code>int prev()</code> Moves the pointer to the left, then returns the number at the pointer.</li></ul>Notice that by initializing the pointer to a non-existent smallest number, the first call to <code>next()</code> will return the smallest element in the BST.<br>You may assume that <code>next()</code> and <code>prev()</code> calls will always be valid. That is, there will be at least a next/previous number in the in-order traversal when <code>next()</code>/<code>prev()</code> is called.",
+        examples: [
+          { input: `["BSTIterator","next","next","prev","next","hasNext","next","next","next","hasNext","hasPrev","prev","prev"]
+[[[7,3,15,null,null,9,20]],[null],[null],[null],[null],[null],[null],[null],[null],[null],[null],[null],[null]]`, output: "[null,3,7,3,7,true,9,15,20,false,true,15,9]", explain: "The in-order traversal is [3,7,9,15,20]. The pointer starts before 3: next()->3, next()->7, prev()->3, next()->7, hasNext()->true, next()->9, next()->15, next()->20, hasNext()->false, hasPrev()->true, prev()->15, prev()->9." }
+        ],
+        constraints: [
+          "The number of nodes in the tree is in the range [1, 10^5].",
+          "0 <= Node.val <= 10^6",
+          "At most 10^5 calls will be made to hasNext, next, hasPrev, and prev.",
+          "Follow up: Could you solve the problem without precalculating the values of the tree?"
+        ],
+        statementHi: "BST ke <b>inorder traversal</b> par ek iterator banao jo <b>aage (next)</b> aur <b>peeche (prev)</b> dono taraf chal sake. Pointer shuru me sabse chhoti value se <b>bhi pehle</b> hota hai, isliye pehla <code>next()</code> smallest value deta hai. Methods: <code>hasNext, next, hasPrev, prev</code>. <i>Follow-up:</i> bina poora inorder pehle se nikaale (O(H) memory) kaise karoge?",
+        memoryFlow: `Constructor: Inorder traversal ──► ArrayList me store karo   [3, 7, 9, 15, 20]
+pointer = -1  (pehle element se bhi pehle)
+
+next()    ──► pointer++  ──► list[pointer]
+prev()    ──► pointer--  ──► list[pointer]
+hasNext() ──► pointer + 1 < size
+hasPrev() ──► pointer - 1 >= 0`,
+        memoryTip: "Inorder ko list me flatten karo aur ek pointer chalao — next/prev dono O(1)!",
+        intuition: `<b>Idea:</b> Inorder = sorted list. Iterator me aage-peeche chalna = list me index ko aage-peeche karna. Pointer ko <code>-1</code> se shuru karte hain ("pehle element se bhi pehle").
+
+<b>Step-by-step:</b>
+1. Constructor me ek baar inorder traversal karke saari values <code>list</code> me bharo (O(N)).
+2. <code>pointer = -1</code>.
+3. <code>next()</code>: <code>pointer++</code> karo, <code>list[pointer]</code> return.
+4. <code>prev()</code>: <code>pointer--</code> karo, <code>list[pointer]</code> return.
+5. <code>hasNext()</code>: <code>pointer + 1 &lt; list.size()</code>.
+6. <code>hasPrev()</code>: <code>pointer - 1 &gt;= 0</code> (pointer 0 par hai toh peeche koi element nahi, kyunki -1 asli element nahi hai).
+
+<b>Dry run</b> list=[3,7,9,15,20]: next→3 (p=0), next→7 (p=1), prev→3 (p=0), next→7 (p=1), hasNext→true ✔.
+
+<b>Complexity:</b> Build O(N), har operation O(1), space O(N).
+
+<b>Follow-up (O(H) memory):</b> Home page ka Template #12 (stack wala controlled inorder) <code>next()</code> ke liye use karo, aur jo values nikal chuke ho unhe ek <code>visited</code> list me rakho taaki <code>prev()</code> un par chal sake. Tab tree ka pura inorder pehle se store nahi karna padta (sirf O(H) stack + ab tak dekhe hue elements).`,
+        pitfalls: [
+          "<code>hasPrev()</code> me <code>pointer &gt; 0</code> chahiye, <code>pointer &gt;= 0</code> nahi (pointer=0 par peeche kuch nahi).",
+          "<code>next()</code> / <code>prev()</code> pehle pointer move karte hain, phir value return karte hain.",
+          "Constructor me hi inorder karna hai; har call par traverse karne se O(N) per call ho jayega."
+        ],
+        java: `class BSTIterator {
+    private final List<Integer> list = new ArrayList<>();  // poora inorder (sorted) yahan
+    private int pointer = -1;   // -1 = pehle element se bhi pehle ("non-existent smallest")
+
+    // Constructor: ek baar inorder traversal karke list bhar do
+    public BSTIterator(TreeNode root) {
+        inorder(root);
+    }
+
+    // Left -> Root -> Right  =>  list sorted order me bharti hai
+    private void inorder(TreeNode node) {
+        if (node == null) return;
+        inorder(node.left);
+        list.add(node.val);
+        inorder(node.right);
+    }
+
+    // Pointer ke right me koi element hai? (pointer + 1 valid index hona chahiye)
+    public boolean hasNext() {
+        return pointer + 1 < list.size();
+    }
+
+    // Pehle pointer ko aage badhao, phir us jagah ki value return karo
+    public int next() {
+        pointer++;
+        return list.get(pointer);
+    }
+
+    // Pointer ke left me koi element hai? (pointer - 1 valid index hona chahiye)
+    public boolean hasPrev() {
+        return pointer - 1 >= 0;
+    }
+
+    // Pehle pointer ko peeche karo, phir us jagah ki value return karo
+    public int prev() {
+        pointer--;
+        return list.get(pointer);
+    }
+}`,
+        python: `class BSTIterator:
+    def __init__(self, root: Optional[TreeNode]):
+        self.arr = []       # poora inorder (sorted) yahan
+        self.idx = -1       # -1 = pehle element se bhi pehle ("non-existent smallest")
+
+        # Left -> Root -> Right  =>  arr sorted order me bharta hai
+        def inorder(node):
+            if not node:
+                return
+            inorder(node.left)
+            self.arr.append(node.val)
+            inorder(node.right)
+
+        inorder(root)
+
+    # Pointer ke right me koi element hai? (idx + 1 valid index hona chahiye)
+    def hasNext(self) -> bool:
+        return self.idx + 1 < len(self.arr)
+
+    # Pehle pointer ko aage badhao, phir us jagah ki value return karo
+    def next(self) -> int:
+        self.idx += 1
+        return self.arr[self.idx]
+
+    # Pointer ke left me koi element hai? (idx - 1 valid index hona chahiye)
+    def hasPrev(self) -> bool:
+        return self.idx - 1 >= 0
+
+    # Pehle pointer ko peeche karo, phir us jagah ki value return karo
+    def prev(self) -> int:
+        self.idx -= 1
+        return self.arr[self.idx]`
+      },
+      {
+        id: 19, lc: 1430, premium: false,
+        title: "Check If a String Is a Valid Sequence from Root to Leaves Path in a Binary Tree",
+        difficulty: "Medium",
+        pattern: "DFS Path Matching with Index",
+        time: "O(N)",
+        space: "O(H)",
+        statement: "Given a binary tree where each path going from the root to any leaf form a <b>valid sequence</b>, check if a given string is a <b>valid sequence</b> in such binary tree.<br>We get the given string from the concatenation of an array of integers <code>arr</code> and the concatenation of all values of the nodes along a path results in a <b>sequence</b> in the given binary tree.",
+        examples: [
+          { input: "root = [0,1,0,0,1,0,null,null,1,0,0], arr = [0,1,0,1]", output: "true", explain: "The path 0 -> 1 -> 0 -> 1 is a valid sequence. Other valid sequences are: 0 -> 1 -> 1 -> 0 and 0 -> 0 -> 0." },
+          { input: "root = [0,1,0,0,1,0,null,null,1,0,0], arr = [0,0,1]", output: "false", explain: "The path 0 -> 0 -> 1 does not exist, therefore it is not even a prefix of any path." },
+          { input: "root = [0,1,0,0,1,0,null,null,1,0,0], arr = [0,1,1]", output: "false", explain: "The path 0 -> 1 -> 1 is a prefix of a valid path but is not a valid sequence (it does not end at a leaf)." }
+        ],
+        constraints: [
+          "1 <= arr.length <= 5000",
+          "0 <= arr[i] <= 9",
+          "Each node's value is between [0 - 9]"
+        ],
+        statementHi: "Ek binary tree aur ek array <code>arr</code> diya hai. Batao ki kya <code>arr</code> tree ke kisi <b>root se leaf tak ke path</b> ke nodes ki values ke <b>exactly barabar</b> hai? Dhyan do: path <b>root se shuru</b> hona chahiye aur <b>leaf par hi khatam</b> hona chahiye (beech me ruk jana invalid hai).",
+        memoryFlow: `dfs(node, idx):
+  1. node == null  OR  idx >= arr.length  OR  node.val != arr[idx]  ──► false
+  2. idx == last index:   (aakhri element match ho gaya)
+         ──► node LEAF hai? (left == null && right == null)
+  3. warna ──► dfs(left, idx+1) || dfs(right, idx+1)`,
+        memoryTip: "Aakhri index par match ke saath node ka LEAF hona bhi zaroori hai!",
+        intuition: `<b>Idea:</b> Root se DFS shuru karo aur saath-saath <code>arr</code> ke index ko aage badhate jao — har node ki value <code>arr[idx]</code> se match honi chahiye.
+
+<b>Step-by-step:</b>
+1. Failure cases (return <code>false</code>): node null hai, <code>idx</code> array se bahar chala gaya, ya <code>node.val != arr[idx]</code>.
+2. Agar <code>idx</code> aakhri index hai (<code>arr.length - 1</code>): array poora match ho gaya, ab check karo node <b>leaf</b> hai (<code>left == null &amp;&amp; right == null</code>). Leaf nahi toh path root-to-leaf nahi hai → false.
+3. Warna left ya right me se kisi ek me aage jaao: <code>dfs(left, idx+1) || dfs(right, idx+1)</code>.
+
+<b>Dry run</b> <code>arr=[0,1,1]</code>: 0 match → 1 match (idx=1) → 1 match (idx=2, last) → leaf? Nahi (iske bachche hain) → <b>false</b> ✔ (prefix hai, sequence nahi).
+
+<b>Complexity:</b> Har node par at most ek baar visit → O(N) time (har path par sirf ≤ len(arr) tak jaate hain). Stack O(H).`,
+        pitfalls: [
+          "Sirf <code>idx == last</code> par match kafi nahi — <b>leaf check</b> bhi karo (example 3).",
+          "Index range check (<code>idx &gt;= arr.length</code>) pehle karo, warna <code>arr[idx]</code> out-of-bounds hoga.",
+          "Dono children me se kisi ek se bhi true aa jaye toh enough → <code>||</code>."
+        ],
+        java: `class Solution {
+    public boolean isValidSequence(TreeNode root, int[] arr) {
+        // Root se shuru, array ke index 0 se match karna shuru
+        return dfs(root, arr, 0);
+    }
+
+    // node ko arr[idx] se match karte hue root-to-leaf path check karta hai
+    private boolean dfs(TreeNode node, int[] arr, int idx) {
+        // Fail cases:
+        //  - node null: path beech me hi khatam ho gaya, par arr abhi baaki hai
+        //  - idx >= arr.length: arr khatam par tree me path aur lamba hai
+        //  - value match nahi hui
+        if (node == null || idx >= arr.length || node.val != arr[idx]) return false;
+
+        // Aakhri element bhi match ho gaya.
+        // Ab path tabhi valid hai jab node LEAF ho (root-to-leaf hona chahiye)
+        if (idx == arr.length - 1) return node.left == null && node.right == null;
+
+        // Abhi arr ke aur elements baaki hain -> left ya right me se kisi me bhi match ho jaye
+        return dfs(node.left, arr, idx + 1) || dfs(node.right, arr, idx + 1);
+    }
+}`,
+        python: `class Solution:
+    def isValidSequence(self, root: Optional[TreeNode], arr: List[int]) -> bool:
+        # node ko arr[idx] se match karte hue root-to-leaf path check karta hai
+        def dfs(node, idx):
+            # Fail cases:
+            #  - node None: path beech me hi khatam ho gaya, par arr abhi baaki hai
+            #  - idx >= len(arr): arr khatam par tree me path aur lamba hai
+            #  - value match nahi hui
+            if not node or idx >= len(arr) or node.val != arr[idx]:
+                return False
+
+            # Aakhri element bhi match ho gaya.
+            # Ab path tabhi valid hai jab node LEAF ho (root-to-leaf hona chahiye)
+            if idx == len(arr) - 1:
+                return not node.left and not node.right
+
+            # Abhi arr ke aur elements baaki hain -> left ya right me se kisi me bhi match ho jaye
+            return dfs(node.left, idx + 1) or dfs(node.right, idx + 1)
+
+        # Root se shuru, array ke index 0 se match karna shuru
+        return dfs(root, 0)`
+      },
+      {
+        id: 20, lc: 272, premium: true,
+        title: "Closest Binary Search Tree Value II",
+        difficulty: "Hard",
+        pattern: "Inorder + Sliding Window Deque of Size K",
+        time: "O(N)",
+        space: "O(K + H)",
+        statement: "Given the <code>root</code> of a binary search tree, a <code>target</code> value, and an integer <code>k</code>, return <i>the</i> <code>k</code> <i>values in the BST that are closest to the</i> <code>target</code>. You may return the answer in <b>any order</b>.<br>You are <b>guaranteed</b> to have only one unique set of <code>k</code> values in the BST that are closest to the <code>target</code>.",
+        examples: [
+          { input: "root = [4,2,5,1,3], target = 3.714286, k = 2", output: "[4,3]", explain: "" },
+          { input: "root = [1], target = 0.000000, k = 1", output: "[1]", explain: "" }
+        ],
+        constraints: [
+          "The number of nodes in the tree is n.",
+          "1 <= k <= n <= 10^4",
+          "0 <= Node.val <= 10^9",
+          "-10^9 <= target <= 10^9",
+          "Follow up: Assume that the BST is balanced. Could you solve it in less than O(n) runtime (where n = total nodes)?"
+        ],
+        statementHi: "BST, ek <code>target</code> (decimal) aur ek integer <code>k</code> diya hai. Tree ki wo <b>k values</b> return karo jo <b>target ke sabse kareeb</b> hain. Answer kisi bhi order me de sakte ho. Guarantee hai ki closest k values ka set <b>unique</b> hai.",
+        memoryFlow: `Inorder (sorted order) + Deque (max size K) ke saath sliding window:
+  size < K                                  ──► addLast(val)
+  size == K  &&  |val - target| < |first - target|
+                                            ──► pollFirst(), addLast(val)   (window aage khiska)
+  size == K  &&  val ab bhi door hai        ──► STOP! (aage ki values aur badi → aur door)`,
+        memoryTip: "Sorted order me K closest chahiye = Size K ka Sliding Window (Deque) + early exit!",
+        intuition: `<b>Observation:</b> Inorder me values sorted aati hain. Sorted array me target ke k closest elements hamesha ek <b>contiguous window</b> banate hain.
+
+<b>Step-by-step:</b>
+1. Inorder traversal karo. Ek <code>deque</code> window rakho (max size k).
+2. Jab tak window me k se kam elements hain → naya value <code>addLast</code>.
+3. Window full hai: naya <code>val</code> ko <code>window.first</code> (sabse chhota, target se sabse door ho sakta hai) se compare karo. Agar <code>|val - target| &lt; |first - target|</code> → <code>first</code> hatao, <code>val</code> add karo (window aage khiska).
+4. Warna → <b>early exit</b>: aage ke saare values aur bade honge (sorted), isliye aur door honge → traversal rok do.
+
+<b>Dry run</b> <code>[4,2,5,1,3]</code>, target=3.71, k=2: inorder 1,2,3,4,5. [1] → [1,2] → val=3: |3-3.71|=0.71 &lt; |1-3.71|=2.71 → [2,3] → val=4: 0.29 &lt; |2-3.71|=1.71 → [3,4] → val=5: 1.29 &lt; |3-3.71|=0.71? Nahi → STOP. Answer <b>[3,4]</b> ✔.
+
+<b>Complexity:</b> Worst O(N), early exit se aksar kam. Space: window O(K) + stack O(H). (Follow-up me balanced BST par O(K + log N) ke liye predecessor/successor stacks use hote hain.)`,
+        pitfalls: [
+          "Compare <code>window.first</code> se karo (sabse chhota), <code>last</code> se nahi — new val hamesha last se bada hota hai.",
+          "Early exit tabhi sahi hai jab traversal <b>sorted order</b> (inorder) me ho.",
+          "Doori <code>double</code> me nikalo; integer subtraction se decimal target ka fraction kho jayega."
+        ],
+        java: `class Solution {
+    public List<Integer> closestKValues(TreeNode root, double target, int k) {
+        // Deque = sliding window of size <= k. Front = sabse chhota (inorder me sabse pehle aaya)
+        Deque<Integer> window = new ArrayDeque<>();
+        inorder(root, target, k, window);
+        return new ArrayList<>(window);
+    }
+
+    private void inorder(TreeNode node, double target, int k, Deque<Integer> window) {
+        if (node == null) return;
+
+        // 1) Pehle left subtree (chhoti values)
+        inorder(node.left, target, k, window);
+
+        if (window.size() < k) {
+            // Window abhi bhari nahi: val seedha add
+            window.addLast(node.val);
+        } else {
+            // Window full hai. Naya val front (sabse chhota) se zyada paas hai?
+            if (Math.abs(node.val - target) < Math.abs(window.peekFirst() - target)) {
+                window.pollFirst();          // sabse door wala (front) hatao
+                window.addLast(node.val);    // naya paas wala add (window aage khiska)
+            } else {
+                // Naya val front se bhi door hai. Sorted order hai, isliye iske baad ki
+                // saari values aur door hongi -> yahin ruk jao (early exit)
+                return;
+            }
+        }
+
+        // 3) Right subtree (badi values)
+        inorder(node.right, target, k, window);
+    }
+}`,
+        python: `from collections import deque
+
+class Solution:
+    def closestKValues(self, root: Optional[TreeNode], target: float, k: int) -> List[int]:
+        # deque = sliding window of size <= k. Front = sabse chhota (inorder me sabse pehle aaya)
+        window = deque()
+
+        def inorder(node):
+            if not node:
+                return
+
+            # 1) Pehle left subtree (chhoti values)
+            inorder(node.left)
+
+            if len(window) < k:
+                # Window abhi bhari nahi: val seedha add
+                window.append(node.val)
+            else:
+                # Window full hai. Naya val front (sabse chhota) se zyada paas hai?
+                if abs(node.val - target) < abs(window[0] - target):
+                    window.popleft()           # sabse door wala (front) hatao
+                    window.append(node.val)    # naya paas wala add (window aage khiska)
+                else:
+                    # Naya val front se bhi door hai. Sorted order hai, isliye iske baad ki
+                    # saari values aur door hongi -> yahin ruk jao (early exit)
+                    return
+
+            # 3) Right subtree (badi values)
+            inorder(node.right)
+
+        inorder(root)
+        return list(window)`
+      }
+    ];
+
+    // ==========================================================
+    // SIDEBAR / NAVIGATION
+    // ==========================================================
+    function renderSidebar(filterText = '') {
+      const listEl = document.getElementById('sidebarList');
+      listEl.innerHTML = '';
+      const qLower = filterText.toLowerCase().trim();
+
+      questions.forEach(q => {
+        const haystack = (q.title + ' ' + q.pattern + ' ' + q.lc + ' ' + q.id).toLowerCase();
+        if (haystack.includes(qLower)) {
+          const item = document.createElement('div');
+          item.className = 'q-item' + (currentView === q.id ? ' active' : '');
+          item.title = q.title;
+          item.onclick = () => showQuestion(q.id);
+          item.innerHTML = `
+            <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${q.id}. ${escapeHtml(q.title)}</span>
+            <span class="badge ${q.difficulty}">${q.difficulty}</span>
+          `;
+          listEl.appendChild(item);
+        }
+      });
+    }
+
+    function filterSidebar() {
+      renderSidebar(document.getElementById('searchInput').value);
+    }
+
+    function setLanguage(lang) {
+      currentLang = lang;
+      document.getElementById('global-java').classList.toggle('active', lang === 'java');
+      document.getElementById('global-python').classList.toggle('active', lang === 'python');
+      // Language badalne par page ke top par wapas na jaye -> keepScroll = true
+      if (currentView === 'home') showHome(true);
+      else if (typeof currentView === 'number') showQuestion(currentView, true);
+    }
+
+    function updateNavButtons() {
+      document.getElementById('btn-home').classList.toggle('active', currentView === 'home');
+      document.getElementById('btn-all').classList.toggle('active', currentView === 'list');
+      renderSidebar(document.getElementById('searchInput').value);
+    }
+
+    // Question numbers ko clickable links me badalta hai (home page ke pattern table ke liye)
+    function qLinks(ids) {
+      return ids.map(id => `<a href="#" style="color: var(--accent); font-weight:600; text-decoration:none;" onclick="showQuestion(${id}); return false;">#${id}</a>`).join(', ');
+    }
+
+    // ==========================================================
+    // HOME PAGE
+    // ==========================================================
+    function langButtonsHtml() {
+      return `
+        <div style="display:flex; gap:8px;">
+          <button class="lang-btn ${currentLang === 'java' ? 'active' : ''}" onclick="setLanguage('java')">☕ Java</button>
+          <button class="lang-btn ${currentLang === 'python' ? 'active' : ''}" onclick="setLanguage('python')">🐍 Python</button>
+        </div>`;
+    }
+
+    function showHome(keepScroll = false) {
+      currentView = 'home';
+      updateNavButtons();
+      document.getElementById('breadcrumb').innerText = 'Home / Core Intuition & Templates';
+      const langName = currentLang === 'java' ? 'Java' : 'Python';
+
+      const tocHtml = templates.map((t, i) =>
+        `<a onclick="document.getElementById('tmpl-${i}').scrollIntoView({behavior:'smooth'})">${escapeHtml(t.title.split(' (')[0])}</a>`
+      ).join('');
+
+      const templateCards = templates.map((t, i) => {
+        const colored = highlightCode(t[currentLang], currentLang);
+        return `
+          <div class="section-box" id="tmpl-${i}">
+            <h3>${t.title}</h3>
+            <p style="color: var(--text-muted); font-size: 0.93rem;">${t.desc}</p>
+            <div class="code-container" style="margin-bottom: 0; margin-top: 10px;">
+              <div class="code-header">
+                ${langButtonsHtml()}
+                <button class="copy-btn" onclick="copyTemplate(${i}, this)">📋 Copy ${langName} Code</button>
+              </div>
+              <pre><code>${colored}</code></pre>
+            </div>
+          </div>`;
+      }).join('');
+
+      const patternRows = [
+        ['Sorted array / list ko <b>balanced BST</b> banana', 'Divide &amp; Conquer: mid = root', [1]],
+        ['Ek <b>value range</b> [low, high] ka sum / count', 'BST Pruning (branch cut karo)', [2]],
+        ['Target ke <b>closest</b> value(s)', 'Binary-search walk + best track / Inorder + Deque', [3, 20]],
+        ['<b>Sorted order</b> chahiye (k-th, min diff, iterator)', 'Inorder traversal (+ prev pointer / counter)', [4, 6, 18]],
+        ['<b>Valid BST?</b> / Largest BST', 'Top-down range (min,max) / Bottom-up tuple', [5, 16]],
+        ['<b>LCA</b> (BST vs normal tree)', 'BST: split point | Tree: postorder', [7, 8]],
+        ['Path sum, <b>children se info</b> leke root par decision', 'Postorder (return gain / tuple)', [9, 16]],
+        ['<b>Insert / Delete / Successor / Split</b>', 'BST recursion; subtree root return karke assign', [10, 11, 12, 13]],
+        ['<b>Preorder</b> array valid BST hai?', 'Monotonic stack + lowerBound', [14]],
+        ['<b>Do trees</b> me pair sum', 'HashSet complement lookup', [15]],
+        ['<b>Insertion order</b> se depth (tree banaye bina)', 'Floor &amp; Ceiling (TreeMap / bisect)', [17]],
+        ['Root-to-leaf <b>sequence match</b>', 'DFS with index + leaf check', [19]]
+      ].map(r => `<tr><td>${r[0]}</td><td>${r[1]}</td><td>${qLinks(r[2])}</td></tr>`).join('');
+
+      document.getElementById('viewContainer').innerHTML = `
+        <div class="hero-card">
+          <h1>🌳 Binary Search Tree (BST) — Master Vault (Final Perfected Edition)</h1>
+          <p style="color: var(--text-muted); font-size: 1.02rem;">
+            Yahan tumhe BST ki <b>poori basics</b> (search, insert, delete, traversals, validate, LCA, iterator...) milengi,
+            aur uske baad <b>20 NeetCode/LeetCode questions</b> — har ek me <b>English problem statement</b>, uske neeche <b>Hinglish version</b>,
+            memory map, step-by-step intuition, common mistakes, aur <b>detailed comments wala Java + Python code</b>.
+          </p>
+          <div style="margin-top: 18px;">
+            <button class="btn-secondary" style="border-color: var(--accent); color: var(--accent);" onclick="showAllQuestions()">
+              🚀 Open All 20 Questions Directory →
+            </button>
+          </div>
+        </div>
+
+        <div class="grid-3">
+          <div class="rule-card">
+            <h3>1. BST Property</h3>
+            <p style="font-size: 0.92rem; color: var(--text-muted);">
+              Har node ke liye: <b>left subtree ki SAARI values &lt; node &lt; right subtree ki SAARI values</b>
+              (sirf bachchon se nahi, poore subtree se). Duplicates (is vault me) allowed nahi.
+            </p>
+          </div>
+          <div class="rule-card">
+            <h3>2. Search Space Elimination</h3>
+            <p style="font-size: 0.92rem; color: var(--text-muted);">
+              Har step par aadha tree eliminate hota hai. Balanced tree me <b>O(log N)</b>, par skewed tree me <b>O(N)</b>.
+              Isliye complexity hamesha <b>O(H)</b> (height) me likhte hain.
+            </p>
+          </div>
+          <div class="rule-card">
+            <h3>3. Inorder = Sorted Array</h3>
+            <p style="font-size: 0.92rem; color: var(--text-muted);">
+              <code>Inorder (Left → Root → Right)</code> chalane par values hamesha <b>strictly increasing</b> milti hain.
+              K-th smallest, min difference, iterator, validate — sab isi se.
+            </p>
+          </div>
+          <div class="rule-card">
+            <h3>4. Top-Down vs Bottom-Up</h3>
+            <p style="font-size: 0.92rem; color: var(--text-muted);">
+              <b>Top-Down (Preorder):</b> parent se bachchon ko info bhejo (range, depth).<br>
+              <b>Bottom-Up (Postorder):</b> bachchon se info lo, root par decision lo (max path sum, largest BST).
+            </p>
+          </div>
+          <div class="rule-card">
+            <h3>5. Hamesha Base Case Pehle</h3>
+            <p style="font-size: 0.92rem; color: var(--text-muted);">
+              Har recursive tree function ki pehli line: <code>if (node == null) return ...</code>.
+              Phir sochho: "left se kya aaya? right se kya aaya? meri value ke saath kya karun?"
+            </p>
+          </div>
+          <div class="rule-card">
+            <h3>6. Subtree Root Return + Assign</h3>
+            <p style="font-size: 0.92rem; color: var(--text-muted);">
+              Insert / Delete / Split me function <b>updated subtree ka root return</b> karta hai.
+              Isliye <code>root.left = func(root.left, ...)</code> likhna zaroori hai.
+            </p>
+          </div>
+        </div>
+
+        <h2 style="margin-bottom: 14px; color: var(--text-main);">⏱️ Complexity Cheat Sheet</h2>
+        <div class="table-wrap">
+          <table class="cheat-table">
+            <tr><th>Operation</th><th>Balanced BST</th><th>Skewed BST (chain)</th><th>Note</th></tr>
+            <tr><td>Search / Insert / Delete</td><td>O(log N)</td><td>O(N)</td><td>= O(H)</td></tr>
+            <tr><td>Min / Max / Floor / Ceiling / Successor</td><td>O(log N)</td><td>O(N)</td><td>Ek hi path chalte hain</td></tr>
+            <tr><td>Any traversal (in/pre/post/level)</td><td>O(N)</td><td>O(N)</td><td>Har node ek baar</td></tr>
+            <tr><td>Recursion stack space</td><td>O(log N)</td><td>O(N)</td><td>= O(H)</td></tr>
+            <tr><td>Sorted array → balanced BST</td><td colspan="2">O(N) time, O(log N) stack</td><td>Mid = root</td></tr>
+          </table>
+        </div>
+
+        <h2 style="margin-bottom: 14px; color: var(--text-main);">🔁 Traversal Cheat Sheet</h2>
+        <div class="table-wrap">
+          <table class="cheat-table">
+            <tr><th>Traversal</th><th>Order</th><th>Kab use karein</th></tr>
+            <tr><td><b>Inorder</b></td><td>Left → <b>Root</b> → Right</td><td>BST ka sorted order (validate, k-th, min diff, iterator)</td></tr>
+            <tr><td><b>Preorder</b></td><td><b>Root</b> → Left → Right</td><td>Tree copy / serialize / BST reconstruct, top-down info</td></tr>
+            <tr><td><b>Postorder</b></td><td>Left → Right → <b>Root</b></td><td>Bottom-up (LCA, max path sum, largest BST, delete tree)</td></tr>
+            <tr><td><b>Level order (BFS)</b></td><td>Level by level (queue)</td><td>Shortest depth, level-wise output, width</td></tr>
+          </table>
+        </div>
+
+        <h2 style="margin-bottom: 14px; color: var(--text-main);">🎯 Exam Trigger → Pattern Selector</h2>
+        <div class="table-wrap">
+          <table class="cheat-table">
+            <tr><th>Question me ye dikhe</th><th>Ye pattern lagao</th><th>Questions</th></tr>
+            ${patternRows}
+          </table>
+        </div>
+
+        <div class="section-box">
+          <h3>📖 Tree Input Format kaise padhein?</h3>
+          <p style="color: var(--text-muted);">
+            Examples me <code>root = [5,3,6,2,4,null,7]</code> <b>level-order</b> (BFS) format hai: pehle root, phir uske bachche left-to-right, phir unke bachche... <code>null</code> = us jagah koi node nahi (aur uske neeche kuch nahi).
+          </p>
+          <div class="example-box">root = [5,3,6,2,4,null,7]
+Level 0:  5
+Level 1:  3  6          (5 ke left = 3, right = 6)
+Level 2:  2  4  null 7  (3 ke bachche = 2,4 | 6 ke bachche = null,7)</div>
+        </div>
+
+        <h2 style="margin-bottom: 8px; color: var(--text-main);">💻 Must-Know Starter Templates (${langName})</h2>
+        <p style="color: var(--text-muted); margin-bottom: 12px;">
+          Har template me Java aur Python dono available hain — kisi bhi card ke upar language button se switch karo.
+          Interview/exam se pehle inhe <b>bina dekhe likhna</b> practice karo.
+        </p>
+        <div class="toc">${tocHtml}</div>
+        <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap; margin-bottom:18px;">
+          ${langButtonsHtml()}
+          <button class="copy-btn" onclick="copyAllTemplates(this)">📋 Copy ALL ${langName} Templates</button>
+        </div>
+        ${templateCards}
+      `;
+      if (!keepScroll) window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // ==========================================================
+    // ALL QUESTIONS DIRECTORY
+    // ==========================================================
+    function showAllQuestions(filterDiff = currentFilter) {
+      currentView = 'list';
+      currentFilter = filterDiff;
+      updateNavButtons();
+      document.getElementById('breadcrumb').innerText = 'Directory / All 20 Questions';
+
+      const filtered = questions.filter(q => filterDiff === 'All' || q.difficulty === filterDiff);
+      const count = d => questions.filter(q => q.difficulty === d).length;
+
+      const cardsHtml = filtered.map(q => `
+        <div class="q-card" onclick="showQuestion(${q.id})">
+          <div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 8px;">
+              <span style="color: var(--accent); font-weight:700; font-size:0.85rem;">QUESTION #${q.id} · LC ${q.lc}${q.premium ? ' · 🔒' : ''}</span>
+              <span class="badge ${q.difficulty}">${q.difficulty}</span>
+            </div>
+            <div class="q-card-title">${escapeHtml(q.title)}</div>
+          </div>
+          <div>
+            <div class="q-card-pattern">🧩 <b>Pattern:</b> ${q.pattern}</div>
+            <div style="margin-top: 8px; font-size: 0.8rem; color: var(--accent); font-weight: 600;">
+              Open Memory Map & Colorful Code →
+            </div>
+          </div>
+        </div>
+      `).join('');
+
+      const btnStyle = (name, color) => filterDiff === name ? `border-color:${color};color:${color};` : '';
+      document.getElementById('viewContainer').innerHTML = `
+        <h1 style="margin-bottom: 8px; color: var(--accent);">📚 All 20 Questions Directory</h1>
+        <p style="color: var(--text-muted); margin-bottom: 20px;">
+          Kisi bhi question par click karein — English statement, Hinglish version, Memory Map, Intuition aur detailed-comment wala code mil jayega. (🔒 = LeetCode Premium question)
+        </p>
+
+        <div class="filter-row">
+          <button class="btn-secondary" style="${btnStyle('All', 'var(--accent)')}" onclick="showAllQuestions('All')">All (${questions.length})</button>
+          <button class="btn-secondary" style="${btnStyle('Easy', 'var(--easy)')}" onclick="showAllQuestions('Easy')">Easy (${count('Easy')})</button>
+          <button class="btn-secondary" style="${btnStyle('Medium', 'var(--medium)')}" onclick="showAllQuestions('Medium')">Medium (${count('Medium')})</button>
+          <button class="btn-secondary" style="${btnStyle('Hard', 'var(--hard)')}" onclick="showAllQuestions('Hard')">Hard (${count('Hard')})</button>
+        </div>
+
+        <div class="q-grid">${cardsHtml}</div>
+      `;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // ==========================================================
+    // SINGLE QUESTION PAGE
+    // ==========================================================
+    function renderExamples(q) {
+      return q.examples.map((ex, i) => `
+        <div class="example-box"><span class="lbl">Example ${i + 1}:</span>
+<span class="lbl">Input:</span>  ${escapeHtml(ex.input)}
+<span class="lbl">Output:</span> ${escapeHtml(ex.output)}${ex.explain ? `
+<span class="lbl">Explanation:</span> <span class="explain">${escapeHtml(ex.explain)}</span>` : ''}</div>
+      `).join('');
+    }
+
+    function showQuestion(id, keepScroll = false) {
+      currentView = id;
+      updateNavButtons();
+      const q = questions.find(item => item.id === id);
+      document.getElementById('breadcrumb').innerText = `Questions / #${q.id} ${q.title}`;
+
+      const rawCode = currentLang === 'java' ? q.java : q.python;
+      const coloredCode = highlightCode(rawCode, currentLang);
+
+      document.getElementById('viewContainer').innerHTML = `
+        <div class="problem-header">
+          <button class="btn-secondary" style="margin-bottom: 16px; padding: 6px 12px; font-size: 0.85rem;" onclick="showAllQuestions()">
+            ← Back to All Questions
+          </button>
+          <div class="problem-title-row">
+            <h1>#${q.id}. ${escapeHtml(q.title)}</h1>
+            <span class="badge ${q.difficulty}" style="font-size: 0.85rem; padding: 4px 12px;">${q.difficulty}</span>
+          </div>
+          <div class="meta-pills">
+            <span class="pill">🔢 <b>LeetCode:</b> #${q.lc}</span>
+            ${q.premium ? '<span class="pill premium">🔒 LeetCode Premium</span>' : ''}
+            <span class="pill">🧩 <b>Pattern:</b> ${q.pattern}</span>
+            <span class="pill">⏱️ <b>Time:</b> ${q.time}</span>
+            <span class="pill">💾 <b>Space:</b> ${q.space}</span>
+          </div>
+        </div>
+
+        <div class="section-box">
+          <h3>📌 Problem Statement (English)</h3>
+          <div style="margin-bottom: 8px;">${q.statement}</div>
+          <h4>Examples</h4>
+          ${renderExamples(q)}
+          <h4>Constraints</h4>
+          <ul class="constraints">${q.constraints.map(c => `<li>${escapeHtml(c)}</li>`).join('')}</ul>
+        </div>
+
+        <div class="hinglish-box">
+          <h3>🇮🇳 Same Question in Hinglish (Samajhne ke liye)</h3>
+          <p>${q.statementHi}</p>
+        </div>
+
+        <div class="memory-box">
+          <h3>🧠 Memory Map & Exam Trigger</h3>
+          <div class="flow-diagram">${escapeHtml(q.memoryFlow)}</div>
+          <p style="color: #c7d2fe; font-weight: 600;">
+            🔑 Exam Trigger: <span style="font-weight: 400; color: #f8fafc;">${q.memoryTip}</span>
+          </p>
+        </div>
+
+        <div class="section-box">
+          <h3>💡 Core Logic & Step-by-Step Intuition</h3>
+          <p style="white-space: pre-line;">${q.intuition}</p>
+        </div>
+
+        <div class="pitfall-box">
+          <h3>⚠️ Common Mistakes / Edge Cases</h3>
+          <ul>${q.pitfalls.map(p => `<li>${p}</li>`).join('')}</ul>
+        </div>
+
+        <div class="code-container">
+          <div class="code-header">
+            <div style="display:flex; gap:8px;">
+              <button class="lang-btn ${currentLang === 'java' ? 'active' : ''}" onclick="setLanguage('java')">☕ Java Solution</button>
+              <button class="lang-btn ${currentLang === 'python' ? 'active' : ''}" onclick="setLanguage('python')">🐍 Python Solution</button>
+            </div>
+            <button class="copy-btn" onclick="copyCurrentQuestionCode(${q.id}, this)">📋 Copy Code</button>
+          </div>
+          <pre><code>${coloredCode}</code></pre>
+        </div>
+
+        <div class="nav-footer">
+          ${q.id > 1 ? `<button class="btn-secondary" onclick="showQuestion(${q.id - 1})">← Prev: #${q.id - 1} ${escapeHtml(questions[q.id - 2].title)}</button>` : `<div></div>`}
+          ${q.id < questions.length ? `<button class="btn-secondary" onclick="showQuestion(${q.id + 1})">Next: #${q.id + 1} ${escapeHtml(questions[q.id].title)} →</button>` : `<div></div>`}
+        </div>
+      `;
+      if (!keepScroll) window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // ==========================================================
+    // COPY HELPERS
+    // ==========================================================
+    function copyCurrentQuestionCode(id, btn) {
+      const q = questions.find(item => item.id === id);
+      copyText(currentLang === 'java' ? q.java : q.python, btn);
+    }
+
+    function copyTemplate(index, btn) {
+      copyText(templates[index][currentLang], btn);
+    }
+
+    function copyAllTemplates(btn) {
+      const sep = currentLang === 'java' ? '\n\n' : '\n\n\n';
+      copyText(templates.map(t => t[currentLang]).join(sep), btn);
+    }
+
+    function copyText(text, btn) {
+      const done = () => {
+        const old = btn.innerText;
+        btn.innerText = '✅ Copied!';
+        setTimeout(() => { btn.innerText = old; }, 1500);
+      };
+      // Fallback: kuch browsers file:// par clipboard API block karte hain
+      const fallback = () => {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand('copy'); done(); } catch (e) { btn.innerText = '❌ Copy failed'; }
+        document.body.removeChild(ta);
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(done).catch(fallback);
+      } else {
+        fallback();
+      }
+    }
+
+    renderSidebar();
+    showHome(true);
+  </script>
+</body>
+</html>
