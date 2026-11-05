@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sliding Window Master Vault — NeetCode 20 Edition</title>
+  <style>
+    :root {
+      --bg-main: #0f172a;
+      --bg-card: #1e293b;
+      --bg-sidebar: #0b1120;
+      --bg-code: #090d16;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --accent: #38bdf8;
+      --border: #334155;
+      --easy: #22c55e;
+      --medium: #f59e0b;
+      --hard: #ef4444;
+      --memory-bg: #1e1b4b;
+      --memory-border: #6366f1;
+
+      /* VS Code Dark Plus Accurate Syntax Colors */
+      --syntax-keyword: #c586c0;
+      --syntax-class: #4ec9b0;
+      --syntax-function: #dcdcaa;
+      --syntax-comment: #6a9955;
+      --syntax-string: #ce9178;
+      --syntax-number: #b5cea8;
+      --syntax-variable: #9cdcfe;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      display: flex;
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background: rgba(148, 163, 184, 0.15);
+      padding: 1px 6px;
+      border-radius: 4px;
+      font-size: 0.9em;
+      color: #e2e8f0;
+    }
+    pre code { background: transparent; padding: 0; font-size: inherit; color: inherit; }
+
+    .sidebar {
+      width: 320px;
+      background-color: var(--bg-sidebar);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 0; bottom: 0; left: 0;
+      overflow-y: auto;
+      z-index: 100;
+    }
+
+    .brand {
+      padding: 18px 20px;
+      border-bottom: 1px solid var(--border);
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .verified-pill {
+      font-size: 0.72rem;
+      background: rgba(34, 197, 94, 0.2);
+      color: #4ade80;
+      padding: 3px 8px;
+      border-radius: 99px;
+      border: 1px solid #22c55e;
+    }
+
+    .nav-top {
+      padding: 12px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .nav-btn {
+      background: transparent;
+      color: var(--text-main);
+      border: 1px solid transparent;
+      padding: 10px 14px;
+      text-align: left;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.92rem;
+      font-weight: 600;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .nav-btn:hover { background-color: var(--bg-card); border-color: var(--border); }
+    .nav-btn.active { background-color: rgba(56, 189, 248, 0.15); color: var(--accent); border-color: var(--accent); }
+
+    .sidebar-search { padding: 12px; border-bottom: 1px solid var(--border); }
+    .sidebar-search input {
+      width: 100%;
+      padding: 9px 12px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background-color: var(--bg-card);
+      color: var(--text-main);
+      font-size: 0.9rem;
+    }
+
+    .sidebar-list { padding: 10px; display: flex; flex-direction: column; gap: 4px; flex: 1; }
+    .q-item {
+      padding: 8px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.86rem;
+      color: var(--text-muted);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.15s;
+    }
+    .q-item:hover { background-color: var(--bg-card); color: var(--text-main); }
+    .q-item.active { background-color: var(--bg-card); color: var(--accent); font-weight: 600; border-left: 3px solid var(--accent); }
+
+    .badge {
+      font-size: 0.68rem;
+      padding: 2px 7px;
+      border-radius: 99px;
+      font-weight: 700;
+      text-transform: uppercase;
+      flex-shrink: 0;
+    }
+    .badge.Easy { background: rgba(34, 197, 94, 0.18); color: var(--easy); }
+    .badge.Medium { background: rgba(245, 158, 11, 0.18); color: var(--medium); }
+    .badge.Hard { background: rgba(239, 68, 68, 0.18); color: var(--hard); }
+
+    .main-content {
+      margin-left: 320px;
+      flex: 1;
+      padding: 32px 44px;
+      max-width: 1150px;
+      min-width: 0;
+    }
+
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 28px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border);
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .lang-switch-global {
+      display: flex;
+      gap: 8px;
+      background: var(--bg-card);
+      padding: 5px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+
+    .lang-btn {
+      background: transparent;
+      color: var(--text-muted);
+      border: none;
+      padding: 6px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.88rem;
+      transition: all 0.2s;
+    }
+    .lang-btn.active { background: var(--accent); color: #0f172a; }
+
+    .hero-card {
+      background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 28px;
+      margin-bottom: 28px;
+    }
+    .hero-card h1 { font-size: 1.8rem; margin-bottom: 10px; color: var(--accent); }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 18px;
+      margin-bottom: 28px;
+    }
+
+    .rule-card {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px;
+    }
+    .rule-card h3 { color: var(--accent); margin-bottom: 10px; font-size: 1.08rem; }
+
+    .cheat-table {
+      width: 100%;
+      border-collapse: collapse;
+      background-color: var(--bg-card);
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 32px;
+      border: 1px solid var(--border);
+    }
+    .cheat-table th, .cheat-table td {
+      padding: 13px 16px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.92rem;
+      vertical-align: top;
+    }
+    .cheat-table th { background-color: #0b1120; color: var(--accent); font-weight: 700; }
+    .table-wrap { overflow-x: auto; }
+
+    .q-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 16px;
+    }
+
+    .q-card {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 18px;
+      cursor: pointer;
+      transition: transform 0.15s, border-color 0.15s;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .q-card:hover { transform: translateY(-3px); border-color: var(--accent); }
+    .q-card-title { font-size: 1.04rem; font-weight: 600; color: var(--text-main); }
+    .q-card-pattern { font-size: 0.83rem; color: var(--text-muted); }
+
+    .problem-header { margin-bottom: 24px; }
+    .problem-title-row { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-bottom: 10px; }
+    .problem-title-row h1 { font-size: 1.7rem; color: var(--text-main); }
+    .meta-pills { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 8px; }
+    .pill { background-color: var(--bg-card); border: 1px solid var(--border); padding: 4px 12px; border-radius: 6px; font-size: 0.82rem; color: var(--text-muted); }
+    .pill.premium { border-color: #f59e0b; color: #fbbf24; }
+
+    .section-box {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 22px;
+      margin-bottom: 22px;
+    }
+    .section-box h3 { color: var(--accent); margin-bottom: 10px; font-size: 1.12rem; }
+    .section-box h4 { color: #cbd5e1; margin: 14px 0 6px; font-size: 0.98rem; }
+    .section-box p { margin-bottom: 8px; }
+
+    .example-box {
+      background-color: rgba(9, 13, 22, 0.7);
+      border-left: 4px solid var(--accent);
+      border-radius: 6px;
+      padding: 10px 14px;
+      margin: 8px 0 12px;
+      font-family: 'Consolas', 'Courier New', monospace;
+      font-size: 0.88rem;
+      white-space: pre-wrap;
+      color: #e2e8f0;
+    }
+    .example-box .lbl { color: var(--accent); font-weight: 700; }
+    .example-box .explain { color: var(--text-muted); font-family: 'Segoe UI', system-ui, sans-serif; }
+
+    .constraints { margin-left: 22px; color: var(--text-muted); font-size: 0.92rem; }
+
+    .hinglish-box {
+      background-color: rgba(34, 197, 94, 0.07);
+      border: 1px solid rgba(34, 197, 94, 0.45);
+      border-radius: 10px;
+      padding: 18px 22px;
+      margin-bottom: 22px;
+    }
+    .hinglish-box h3 { color: #4ade80; margin-bottom: 8px; font-size: 1.05rem; }
+
+    .pitfall-box {
+      background-color: rgba(239, 68, 68, 0.07);
+      border: 1px solid rgba(239, 68, 68, 0.45);
+      border-radius: 10px;
+      padding: 18px 22px;
+      margin-bottom: 22px;
+    }
+    .pitfall-box h3 { color: #f87171; margin-bottom: 8px; font-size: 1.05rem; }
+    .pitfall-box ul { margin-left: 22px; }
+    .pitfall-box li { margin-bottom: 4px; }
+
+    .memory-box {
+      background-color: var(--memory-bg);
+      border: 2px solid var(--memory-border);
+      border-radius: 10px;
+      padding: 22px;
+      margin-bottom: 22px;
+    }
+    .memory-box h3 { color: #a5b4fc; margin-bottom: 12px; font-size: 1.12rem; }
+
+    .flow-diagram {
+      background-color: rgba(9, 13, 22, 0.75);
+      padding: 14px 18px;
+      border-radius: 8px;
+      font-family: 'Consolas', 'Courier New', monospace;
+      color: #e0e7ff;
+      font-size: 0.9rem;
+      overflow-x: auto;
+      white-space: pre-wrap;
+      margin-bottom: 12px;
+      border-left: 4px solid #818cf8;
+    }
+
+    .code-container {
+      background-color: var(--bg-code);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 28px;
+    }
+
+    .code-header {
+      background-color: #131c2e;
+      padding: 10px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .copy-btn {
+      background-color: var(--bg-card);
+      color: var(--text-main);
+      border: 1px solid var(--border);
+      padding: 5px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.82rem;
+      font-weight: 600;
+    }
+    .copy-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+    pre {
+      padding: 20px;
+      overflow-x: auto;
+      font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+      font-size: 0.91rem;
+      line-height: 1.6;
+      color: #d4d4d4;
+    }
+
+    /* VS Code Dark Plus Syntax Highlighting Classes */
+    .token.keyword { color: var(--syntax-keyword); font-weight: 600; }
+    .token.class-name { color: var(--syntax-class); }
+    .token.function { color: var(--syntax-function); }
+    .token.comment { color: var(--syntax-comment); font-style: italic; }
+    .token.string { color: var(--syntax-string); }
+    .token.number { color: var(--syntax-number); }
+
+    .nav-footer {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 30px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
+    }
+
+    .btn-secondary {
+      background-color: var(--bg-card);
+      color: var(--text-main);
+      border: 1px solid var(--border);
+      padding: 10px 18px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+
+    .filter-row { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+
+    .toc { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 22px; }
+    .toc a {
+      font-size: 0.82rem; color: var(--accent); text-decoration: none;
+      border: 1px solid var(--border); background: var(--bg-card);
+      padding: 4px 10px; border-radius: 99px; cursor: pointer;
+    }
+    .toc a:hover { border-color: var(--accent); }
+
+    @media (max-width: 900px) {
+      .sidebar { position: static; width: 100%; height: auto; border-right: none; border-bottom: 1px solid var(--border); }
+      body { flex-direction: column; }
+      .main-content { margin-left: 0; padding: 20px; }
+    }
+  </style>
+</head>
+<body>
+
+  <aside class="sidebar">
+    <div class="brand">
+      <span>🪟 Sliding Window Vault</span>
+      <span class="verified-pill">✓ NeetCode 20</span>
+    </div>
+    <div class="nav-top">
+      <button id="btn-home" class="nav-btn active" onclick="showHome()">
+        <span>🏠 Home: Templates & Rules</span>
+      </button>
+      <button id="btn-all" class="nav-btn" onclick="showAllQuestions()">
+        <span>📚 All 20 Questions</span>
+        <span class="badge" style="background: rgba(56,189,248,0.2); color: var(--accent);">20</span>
+      </button>
+    </div>
+    <div class="sidebar-search">
+      <input type="text" id="searchInput" placeholder="🔍 Search question or pattern..." oninput="filterSidebar()" />
+    </div>
+    <div class="sidebar-list" id="sidebarList"></div>
+  </aside>
+
+  <main class="main-content">
+    <div class="top-bar">
+      <div id="breadcrumb" style="color: var(--text-muted); font-size: 0.92rem;">
+        Home / Sliding Window Blueprint
+      </div>
+      <div class="lang-switch-global">
+        <button id="global-java" class="lang-btn active" onclick="setLanguage('java')">☕ Java</button>
+        <button id="global-python" class="lang-btn" onclick="setLanguage('python')">🐍 Python</button>
+      </div>
+    </div>
+
+    <div id="viewContainer"></div>
+  </main>
+
+  <script>
+    let currentLang = 'java';
+    let currentView = 'home';
+    let currentFilter = 'All';
+
+    const templates = [{"title": "1. Fixed-Size Window Template (Size = K)", "desc": "Jab window ka size pehle se fix (<code>k</code>) ho, jaise maximum/minimum sum of size <code>k</code>, average, ya vowels count. Pehle <code>k</code> elements se window bharo, phir ek element right se add karo aur ek left se hatao.", "java": "public class FixedWindowTemplate {\n    // Standard template for any fixed window of size K\n    public static int fixedWindowSum(int[] nums, int k) {\n        if (nums == null || nums.length < k || k <= 0) return 0;\n\n        int currentSum = 0;\n\n        // Step 1: Pehli window [0 .. k-1] build karo\n        for (int i = 0; i < k; i++) {\n            currentSum += nums[i];\n        }\n\n        int maxSum = currentSum;\n\n        // Step 2: Window ko ek-ek step aage slide karo\n        // Right par nums[i] add hoga, Left se nums[i - k] bahar nikal jayega\n        for (int i = k; i < nums.length; i++) {\n            currentSum += nums[i];      // Expand right\n            currentSum -= nums[i - k];  // Shrink left\n            maxSum = Math.max(maxSum, currentSum);\n        }\n\n        return maxSum;\n    }\n}", "python": "def fixed_window_sum(nums: list[int], k: int) -> int:\n    \"\"\"Standard template for any fixed window of size K.\"\"\"\n    if not nums or len(nums) < k or k <= 0:\n        return 0\n\n    # Step 1: Pehli window [0 .. k-1] build karo\n    curr_sum = sum(nums[:k])\n    max_sum = curr_sum\n\n    # Step 2: Window slide karo: right element aayega, left wala bahar jayega\n    for i in range(k, len(nums)):\n        curr_sum += nums[i] - nums[i - k]\n        max_sum = max(max_sum, curr_sum)\n\n    return max_sum"}, {"title": "2. Variable-Size Window — Longest Valid Subarray", "desc": "Jab sawaal me pucha ho: <i>'Find the length of longest valid subarray/substring'</i>. <code>right</code> pointer ko aage badhao (expand), aur jab tak condition invalid ho, <code>left</code> ko aage badha kar window ko valid banao (shrink).", "java": "import java.util.*;\n\npublic class VariableWindowLongest {\n    // Template for Longest Subarray satisfying a given condition\n    public static int longestValidSubarray(int[] nums, int target) {\n        int left = 0;\n        int maxLen = 0;\n        int currentWindowSum = 0;\n\n        for (int right = 0; right < nums.length; right++) {\n            // 1. Right element ko window me add karo\n            currentWindowSum += nums[right];\n\n            // 2. Agar window invalid ho gayi, toh left ko badha kar VALID banao\n            while (currentWindowSum > target && left <= right) {\n                currentWindowSum -= nums[left];\n                left++;\n            }\n\n            // 3. Ab window guaranteed VALID hai, answer update karo\n            maxLen = Math.max(maxLen, right - left + 1);\n        }\n\n        return maxLen;\n    }\n}", "python": "def longest_valid_subarray(nums: list[int], target: int) -> int:\n    \"\"\"Template for Longest Subarray satisfying a condition.\"\"\"\n    left = 0\n    max_len = 0\n    curr_sum = 0\n\n    for right in range(len(nums)):\n        # 1. Right element ko window me add karo\n        curr_sum += nums[right]\n\n        # 2. Window invalid hui toh shrink karo jab tak valid na ho jaye\n        while curr_sum > target and left <= right:\n            curr_sum -= nums[left]\n            left += 1\n\n        # 3. Yahan window valid hai -> answer record karo\n        max_len = max(max_len, right - left + 1)\n\n    return max_len"}, {"title": "3. Variable-Size Window — Shortest / Minimum Valid Subarray", "desc": "Jab sawaal bole: <i>'Find the minimum length subarray whose sum &ge; target'</i>. Yahan jaise hi window VALID hoti hai, turant answer update karo aur <code>left</code> ko shrink karke dekho kya aur chhoti valid window mil sakti hai.", "java": "public class VariableWindowShortest {\n    // Template for Shortest Subarray satisfying condition\n    public static int minSubArrayLen(int target, int[] nums) {\n        int left = 0;\n        int currentSum = 0;\n        int minLen = Integer.MAX_VALUE;\n\n        for (int right = 0; right < nums.length; right++) {\n            // Expand right\n            currentSum += nums[right];\n\n            // Jab tak window VALID hai, answer record karo aur chhota banane ki koshish karo\n            while (currentSum >= target) {\n                minLen = Math.min(minLen, right - left + 1);\n                currentSum -= nums[left];\n                left++; // Shrink left\n            }\n        }\n\n        return minLen == Integer.MAX_VALUE ? 0 : minLen;\n    }\n}", "python": "def min_subarray_len(target: int, nums: list[int]) -> int:\n    \"\"\"Template for Shortest Subarray satisfying condition.\"\"\"\n    left = 0\n    curr_sum = 0\n    min_len = float('inf')\n\n    for right in range(len(nums)):\n        curr_sum += nums[right]\n\n        # Jab tak condition satisfy ho rahi hai, length minimize karo\n        while curr_sum >= target:\n            min_len = min(min_len, right - left + 1)\n            curr_sum -= nums[left]\n            left += 1\n\n    return 0 if min_len == float('inf') else min_len"}, {"title": "4. Character Frequency & Anagram Matching Template", "desc": "String sliding window me <code>int[26]</code> ya <code>int[128]</code> frequency map sabse fastest hota hai. Ek <code>matchedCount</code> variable rakhne se har baar 26-char loop lagane ki zaroorat nahi padti.", "java": "import java.util.*;\n\npublic class FrequencyMatchingTemplate {\n    // O(1) space string frequency matching pattern\n    public static boolean checkInclusion(String pattern, String text) {\n        if (pattern.length() > text.length()) return false;\n\n        int[] targetFreq = new int[26];\n        int[] windowFreq = new int[26];\n\n        for (char c : pattern.toCharArray()) targetFreq[c - 'a']++;\n\n        int k = pattern.length();\n        // Pehli window of size k\n        for (int i = 0; i < k; i++) windowFreq[text.charAt(i) - 'a']++;\n        if (Arrays.equals(targetFreq, windowFreq)) return true;\n\n        // Slide window\n        for (int i = k; i < text.length(); i++) {\n            windowFreq[text.charAt(i) - 'a']++;      // add right\n            windowFreq[text.charAt(i - k) - 'a']--;  // remove left\n            if (Arrays.equals(targetFreq, windowFreq)) return true;\n        }\n\n        return false;\n    }\n}", "python": "def check_inclusion(pattern: str, text: str) -> bool:\n    \"\"\"Frequency matching template using 26-size list or Counter.\"\"\"\n    if len(pattern) > len(text):\n        return False\n\n    p_count = [0] * 26\n    w_count = [0] * 26\n\n    for ch in pattern:\n        p_count[ord(ch) - ord('a')] += 1\n\n    k = len(pattern)\n    for i in range(k):\n        w_count[ord(text[i]) - ord('a')] += 1\n\n    if p_count == w_count:\n        return True\n\n    for i in range(k, len(text)):\n        w_count[ord(text[i]) - ord('a')] += 1\n        w_count[ord(text[i - k]) - ord('a')] -= 1\n        if p_count == w_count:\n            return True\n\n    return False"}, {"title": "5. Subarrays Count Formula: right - left + 1", "desc": "Jab sawaal puche: <i>'Count how many subarrays satisfy condition'</i>. Har step par jab window <code>[left .. right]</code> valid ho, toh right par END hone wale <b>exact (right - left + 1)</b> naye subarrays valid hote hain!", "java": "public class SubarrayCountTemplate {\n    // Har valid [left .. right] window ke liye:\n    // (right - left + 1) subarrays right par end hote hain.\n    public static int numSubarraysCondition(int[] nums, int k) {\n        int left = 0;\n        int totalSubarrays = 0;\n        int currentMetric = 0;\n\n        for (int right = 0; right < nums.length; right++) {\n            currentMetric += nums[right];\n\n            while (currentMetric > k && left <= right) {\n                currentMetric -= nums[left];\n                left++;\n            }\n\n            // Key formula:\n            // Subarrays ending at 'right': [nums[right]], [nums[right-1], nums[right]], ...\n            // Total such subarrays = right - left + 1\n            totalSubarrays += (right - left + 1);\n        }\n\n        return totalSubarrays;\n    }\n}", "python": "def num_subarrays_condition(nums: list[int], k: int) -> int:\n    \"\"\"Formula: har valid window [left..right] me (right - left + 1) naye subarrays bante hain.\"\"\"\n    left = 0\n    total = 0\n    curr_metric = 0\n\n    for right in range(len(nums)):\n        curr_metric += nums[right]\n\n        while curr_metric > k and left <= right:\n            curr_metric -= nums[left]\n            left += 1\n\n        # Har naye right ke sath (right - left + 1) subarrays milte hain\n        total += (right - left + 1)\n\n    return total"}, {"title": "6. Exactly K Pattern: exact(K) = atMost(K) - atMost(K - 1)", "desc": "Agar condition bole: <i>'Find number of subarrays with EXACTLY K distinct elements'</i>. Seedhe window shrink karna mushkil hota hai, isliye rule lagao: <code>exact(K) = atMost(K) - atMost(K - 1)</code>.", "java": "public class ExactKPatternTemplate {\n    // Exactly(k) = atMost(k) - atMost(k - 1)\n    public static int exactK(int[] nums, int k) {\n        return atMostK(nums, k) - atMostK(nums, k - 1);\n    }\n\n    private static int atMostK(int[] nums, int k) {\n        if (k < 0) return 0;\n        int left = 0, count = 0;\n        java.util.Map<Integer, Integer> freq = new java.util.HashMap<>();\n\n        for (int right = 0; right < nums.length; right++) {\n            freq.put(nums[right], freq.getOrDefault(nums[right], 0) + 1);\n\n            while (freq.size() > k) {\n                freq.put(nums[left], freq.get(nums[left]) - 1);\n                if (freq.get(nums[left]) == 0) freq.remove(nums[left]);\n                left++;\n            }\n\n            count += (right - left + 1);\n        }\n        return count;\n    }\n}", "python": "def exact_k(nums: list[int], k: int) -> int:\n    \"\"\"Golden Rule: exact(k) = at_most(k) - at_most(k - 1)\"\"\"\n    def at_most(limit: int) -> int:\n        if limit < 0:\n            return 0\n        from collections import defaultdict\n        freq = defaultdict(int)\n        left = 0\n        count = 0\n        for right in range(len(nums)):\n            freq[nums[right]] += 1\n            while len(freq) > limit:\n                freq[nums[left]] -= 1\n                if freq[nums[left]] == 0:\n                    del freq[nums[left]]\n                left += 1\n            count += (right - left + 1)\n        return count\n\n    return at_most(k) - at_most(k - 1)"}, {"title": "7. Monotonic Deque for Sliding Window Maximum", "desc": "Fixed size <code>k</code> window me agar maximum ya minimum chahiye $O(N)$ time me, toh Monotonic Deque use hota hai. Deque me indexes store karte hain aur strictly decreasing order maintain karte hain.", "java": "import java.util.*;\n\npublic class MonotonicDequeTemplate {\n    // Sliding Window Maximum in O(N) using Deque\n    public static int[] maxSlidingWindow(int[] nums, int k) {\n        int n = nums.length;\n        int[] result = new int[n - k + 1];\n        int ri = 0;\n\n        // Deque stores INDEXES, values are monotonically decreasing\n        Deque<Integer> dq = new ArrayDeque<>();\n\n        for (int i = 0; i < n; i++) {\n            // 1. Jo index window se bahar ho gaya usko front se hatao\n            if (!dq.isEmpty() && dq.peekFirst() <= i - k) {\n                dq.pollFirst();\n            }\n\n            // 2. Chhoti values ko back se pop karo (kyunki nums[i] bada hai aur baad tak rahega)\n            while (!dq.isEmpty() && nums[dq.peekLast()] <= nums[i]) {\n                dq.pollLast();\n            }\n\n            // 3. Current index add karo\n            dq.offerLast(i);\n\n            // 4. Jab pehli window ready ho jaye, front element max hota hai\n            if (i >= k - 1) {\n                result[ri++] = nums[dq.peekFirst()];\n            }\n        }\n\n        return result;\n    }\n}", "python": "from collections import deque\n\ndef max_sliding_window(nums: list[int], k: int) -> list[int]:\n    \"\"\"Monotonic Deque template for O(N) sliding window max.\"\"\"\n    dq = deque()  # stores indexes; values are monotonically decreasing\n    res = []\n\n    for i in range(len(nums)):\n        # 1. Window se bahar wala index front se pop karo\n        if dq and dq[0] <= i - k:\n            dq.popleft()\n\n        # 2. Chhote elements back se pop karo\n        while dq and nums[dq[-1]] <= nums[i]:\n            dq.pop()\n\n        # 3. Naya index push karo\n        dq.append(i)\n\n        # 4. Window complete hone par answer me front element add karo\n        if i >= k - 1:\n            res.append(nums[dq[0]])\n\n    return res"}, {"title": "8. Inverse Sliding Window (Circular / Ends Selection)", "desc": "Jab sawaal bole: <i>'Array ke left ya right ends se total K elements choose karke sum maximize karo'</i>. Iska ulta socho: bache hue <code>(N - K)</code> elements ka <b>minimum contiguous subarray sum</b> dhoondo!", "java": "public class InverseSlidingWindowTemplate {\n    // Max points from either end = TotalSum - MinSubarraySumOfSize(N - K)\n    public static int maxScore(int[] cardPoints, int k) {\n        int n = cardPoints.length;\n        int totalSum = 0;\n        for (int pt : cardPoints) totalSum += pt;\n\n        if (k == n) return totalSum;\n\n        // Bache hue beech ke elements ka size\n        int windowSize = n - k;\n        int currentWindowSum = 0;\n\n        for (int i = 0; i < windowSize; i++) {\n            currentWindowSum += cardPoints[i];\n        }\n\n        int minWindowSum = currentWindowSum;\n\n        for (int i = windowSize; i < n; i++) {\n            currentWindowSum += cardPoints[i] - cardPoints[i - windowSize];\n            minWindowSum = Math.min(minWindowSum, currentWindowSum);\n        }\n\n        return totalSum - minWindowSum;\n    }\n}", "python": "def max_score(card_points: list[int], k: int) -> int:\n    \"\"\"Inverse Window: Max from ends == Total - MinSubarray(size n - k)\"\"\"\n    n = len(card_points)\n    total_sum = sum(card_points)\n    if k == n:\n        return total_sum\n\n    win_size = n - k\n    curr_sum = sum(card_points[:win_size])\n    min_sum = curr_sum\n\n    for i in range(win_size, n):\n        curr_sum += card_points[i] - card_points[i - win_size]\n        min_sum = min(min_sum, curr_sum)\n\n    return total_sum - min_sum"}];
+    const questions = [{"id": 1, "lc": 121, "premium": false, "title": "Best Time to Buy and Sell Stock", "difficulty": "Easy", "pattern": "Two-Pointer / Dynamic Window (Min Buy Price)", "time": "O(N)", "space": "O(1)", "statement": "You are given an array <code>prices</code> where <code>prices[i]</code> is the price of a given stock on the <code>i<sup>th</sup></code> day.<br>You want to maximize your profit by choosing a <b>single day</b> to buy one stock and choosing a <b>different day in the future</b> to sell that stock.<br>Return the maximum profit you can achieve from this transaction. If you cannot achieve any profit, return <code>0</code>.", "examples": [{"input": "prices = [7,1,5,3,6,4]", "output": "5", "explain": "Buy on day 2 (price = 1) and sell on day 5 (price = 6), profit = 6 - 1 = 5. Note that buying on day 2 and selling on day 1 is not allowed because you must buy before you sell."}, {"input": "prices = [7,6,4,3,1]", "output": "0", "explain": "In this case, no transactions are done and the max profit = 0."}], "constraints": ["1 <= prices.length <= 10^5", "0 <= prices[i] <= 10^4"], "statementHi": "Tumhe stock prices ka ek array diya hai. Ek din khareedna (buy) hai aur aage kisi din bechna (sell) hai. Max profit kitna kama sakte ho? Agar koi profit nahi ban sakta toh <code>0</code> return karo.", "memoryFlow": "Prices: [ 7,  1,  5,  3,  6,  4 ]\n           L   R\n           Buy Sell\n\nDay 0: L=7, R=1 -> 1 < 7 (loss), shift L = R (new min buy = 1)\nDay 1: L=1, R=5 -> Profit = 5 - 1 = 4 (maxProfit = 4)\nDay 2: L=1, R=3 -> Profit = 3 - 1 = 2\nDay 3: L=1, R=6 -> Profit = 6 - 1 = 5 (maxProfit = 5)\nDay 4: L=1, R=4 -> Profit = 4 - 1 = 3\nResult = 5", "memoryTip": "Jab bhi right price left price se kam ho jaye, turant left ko right par le aao (naya lowest buy price mil gaya)!", "intuition": "<b>Key observation:</b> Sell hamesha Buy ke baad aayega. Isliye hume har din ke liye usse pehle ka <b>minimum price</b> pata hona chahiye.\n<b>Sliding Window view:</b>\n- Pointer <code>L</code> represent karta hai 'Buy Day'.\n- Pointer <code>R</code> represent karta hai 'Sell Day'.\n- Agar <code>prices[R] > prices[L]</code>, toh profit = <code>prices[R] - prices[L]</code> calculate karo aur max update karo.\n- Agar <code>prices[R] < prices[L]</code>, iska matlab aaj tak ka sabse sasta buy price mil gaya, toh <code>L = R</code> karke window shift karo.\n\n<b>Complexity:</b> Array ko sirf ek baar traverse karte hain -> O(N) time, O(1) space.", "pitfalls": ["Pehle bech kar baad me khareed nahi sakte (R hamesha L ke aage hoga).", "Agar prices strictly decreasing hain (e.g. [7,6,4,3,1]), answer 0 hona chahiye, negative nahi."], "java": "class Solution {\n    public int maxProfit(int[] prices) {\n        // L: buy day pointer, R: sell day pointer\n        int left = 0;\n        int maxProfit = 0;\n\n        for (int right = 1; right < prices.length; right++) {\n            // Agar sell price buy price se zyada hai, profit ban raha hai\n            if (prices[right] > prices[left]) {\n                int profit = prices[right] - prices[left];\n                maxProfit = Math.max(maxProfit, profit);\n            } else {\n                // Agar aaj ka price purane buy price se bhi sasta hai,\n                // toh hum buy pointer ko aaj ke din shift kar denge!\n                left = right;\n            }\n        }\n\n        return maxProfit;\n    }\n}", "python": "class Solution:\n    def maxProfit(self, prices: list[int]) -> int:\n        left = 0  # Buy pointer\n        max_profit = 0\n\n        for right in range(1, len(prices)):\n            # Agar sell price > buy price hai toh profit calculate karo\n            if prices[right] > prices[left]:\n                profit = prices[right] - prices[left]\n                max_profit = max(max_profit, profit)\n            else:\n                # Sasta khareedne ka mauka mil gaya -> buy pointer ko right par shift karo\n                left = right\n\n        return max_profit"}, {"id": 2, "lc": 643, "premium": false, "title": "Maximum Average Subarray I", "difficulty": "Easy", "pattern": "Fixed-Size Window (K elements)", "time": "O(N)", "space": "O(1)", "statement": "You are given an integer array <code>nums</code> consisting of <code>n</code> elements, and an integer <code>k</code>.<br>Find a contiguous subarray whose <b>length is equal to <code>k</code></b> that has the maximum average value and return this value. Any answer with a calculation error less than <code>10<sup>-5</sup></code> will be accepted.", "examples": [{"input": "nums = [1,12,-5,-6,50,3], k = 4", "output": "12.75000", "explain": "Maximum average is (12 - 5 - 6 + 50) / 4 = 51 / 4 = 12.75"}, {"input": "nums = [5], k = 1", "output": "5.00000", "explain": "Single element average is 5/1 = 5.0"}], "constraints": ["n == nums.length", "1 <= k <= n <= 10^5", "-10^4 <= nums[i] <= 10^4"], "statementHi": "Array me se koi bhi <code>k</code> length ka continuous tukda (subarray) choose karo jiska average sabse bada ho. Maximum average return karo.", "memoryFlow": "nums = [ 1, 12, -5, -6, 50,  3 ], k = 4\n       [ 1, 12, -5, -6 ]               -> sum = 2\n          [ 12, -5, -6, 50 ]           -> sum = 2 - 1 + 50 = 51 (MAX!)\n              [ -5, -6, 50,  3 ]       -> sum = 51 - 12 + 3 = 42\n\nMax Sum = 51 -> Max Avg = 51 / 4 = 12.75", "memoryTip": "Average bar-bar divide karne se float precision issues aate hain. Pehle maximum SUM nikalo, aakhri me ek baar k se divide karo!", "intuition": "<b>Key observation:</b> Har window ka size exactly <code>k</code> hai. Isliye average maximize karna aur sum maximize karna ek hi baat hai.\n1. Pehle index <code>0</code> se <code>k-1</code> tak ka sum nikaal lo.\n2. Ab index <code>k</code> se aage loop chalao:\n   - Window me aage ka element add karo: <code>sum += nums[i]</code>\n   - Window se peechhe ka element hatao: <code>sum -= nums[i - k]</code>\n   - <code>maxSum = max(maxSum, sum)</code>\n3. Aakhri me <code>(double) maxSum / k</code> return karo.", "pitfalls": ["Integer division se bachna: Java me <code>(double) maxSum / k</code> karo, warna decimal point cut jayega.", "Sum variable me negative numbers bhi ho sakte hain, isliye `maxSum` ko 0 se initialize mat karo, pehli window ke sum se karo."], "java": "class Solution {\n    public double findMaxAverage(int[] nums, int k) {\n        // Step 1: Pehli window [0 .. k-1] ka sum nikalo\n        long currentSum = 0;\n        for (int i = 0; i < k; i++) {\n            currentSum += nums[i];\n        }\n\n        long maxSum = currentSum;\n\n        // Step 2: Window ko slide karo\n        for (int i = k; i < nums.length; i++) {\n            // Naya element add karo aur k kadam peechhe wala hatao\n            currentSum += nums[i] - nums[i - k];\n            maxSum = Math.max(maxSum, currentSum);\n        }\n\n        // Ek hi baar double division karo\n        return (double) maxSum / k;\n    }\n}", "python": "class Solution:\n    def findMaxAverage(self, nums: list[int], k: int) -> float:\n        # Step 1: Pehli window ka sum\n        curr_sum = sum(nums[:k])\n        max_sum = curr_sum\n\n        # Step 2: Slide window: +nums[i] - nums[i-k]\n        for i in range(k, len(nums)):\n            curr_sum += nums[i] - nums[i - k]\n            if curr_sum > max_sum:\n                max_sum = curr_sum\n\n        return max_sum / k"}, {"id": 3, "lc": 219, "premium": false, "title": "Contains Duplicate II", "difficulty": "Easy", "pattern": "Fixed-Size Window (HashSet of size K)", "time": "O(N)", "space": "O(K)", "statement": "Given an integer array <code>nums</code> and an integer <code>k</code>, return <code>true</code> if there are two <b>distinct indices</b> <code>i</code> and <code>j</code> in the array such that <code>nums[i] == nums[j]</code> and <code>abs(i - j) <= k</code>.", "examples": [{"input": "nums = [1,2,3,1], k = 3", "output": "true", "explain": "nums[0] == nums[3] and abs(0 - 3) = 3 <= 3."}, {"input": "nums = [1,0,1,1], k = 1", "output": "true", "explain": "nums[2] == nums[3] and abs(2 - 3) = 1 <= 1."}, {"input": "nums = [1,2,3,1,2,3], k = 2", "output": "false", "explain": "Same numbers exist but distance between them is 3 > 2."}], "constraints": ["1 <= nums.length <= 10^5", "-10^9 <= nums[i] <= 10^9", "0 <= k <= 10^5"], "statementHi": "Check karo kya array me do same numbers aisi jagah par hain jinki duri (indexes ka difference) <code>k</code> ya usse kam ho.", "memoryFlow": "nums = [ 1, 2, 3, 1 ], k = 3\ni = 0: set = {1}\ni = 1: set = {1, 2}\ni = 2: set = {1, 2, 3}\ni = 3: 1 already set me hai! Aur distance 3 - 0 = 3 <= 3 -> Return TRUE!", "memoryTip": "HashSet ka size kabhi bhi k se bada mat hone do. Jaise hi index > k ho, i-k-1 wala purana element set se nikaal do.", "intuition": "<b>Sliding Window with Hash Set:</b>\nHume sirf pichle <code>k</code> elements ko yaad rakhna hai.\nAgar current element <code>nums[i]</code> already HashSet me hai, toh iska matlab distance $\\le k$ par duplicate mil gaya -> return `true`.\nAgar `i > k`, toh jo element window se bahar ho gaya (<code>nums[i - k - 1]</code>), use set se remove kar do.", "pitfalls": ["Set se remove karte waqt index dhyaan se dekhein: `nums[i - k - 1]` remove hota hai jab size `k + 1` ho jata hai.", "k = 0 hone par condition `abs(i - j) <= 0` impossible hoti hai kyunki indices distinct hone chahiye."], "java": "import java.util.*;\n\nclass Solution {\n    public boolean containsNearbyDuplicate(int[] nums, int k) {\n        if (k <= 0 || nums == null) return false;\n\n        // Window me at most k elements rahenge\n        Set<Integer> window = new HashSet<>();\n\n        for (int i = 0; i < nums.length; i++) {\n            // Agar pehle se window me hai, toh distance <= k par duplicate mil gaya\n            if (window.contains(nums[i])) {\n                return true;\n            }\n\n            window.add(nums[i]);\n\n            // Agar window ka size k se bada ho gaya, purana element hatao\n            if (window.size() > k) {\n                window.remove(nums[i - k]);\n            }\n        }\n\n        return false;\n    }\n}", "python": "class Solution:\n    def containsNearbyDuplicate(self, nums: list[int], k: int) -> bool:\n        if k <= 0:\n            return False\n\n        window = set()\n\n        for i, val in enumerate(nums):\n            # Duplicate within distance k found\n            if val in window:\n                return True\n\n            window.add(val)\n\n            # Window size maintain karo at most k\n            if len(window) > k:\n                window.remove(nums[i - k])\n\n        return False"}, {"id": 4, "lc": 1876, "premium": false, "title": "Substrings of Size Three with Distinct Characters", "difficulty": "Easy", "pattern": "Fixed-Size Window (K = 3 Distinct Check)", "time": "O(N)", "space": "O(1)", "statement": "A string is <b>good</b> if there are no repeated characters.<br>Given a string <code>s</code>, return the number of <b>good substrings</b> of length <b>three</b>.<br>Note that if there are multiple occurrences of the same substring, every occurrence should be counted.", "examples": [{"input": "s = \"xyzzaz\"", "output": "1", "explain": "There are 4 substrings of size 3: \"xyz\", \"yzz\", \"zza\", and \"zaz\". The only good substring of length 3 is \"xyz\"."}, {"input": "s = \"aababcabc\"", "output": "4", "explain": "Good substrings of length 3 are \"abc\", \"bca\", \"cab\", and \"abc\"."}], "constraints": ["1 <= s.length <= 100", "s consists of lowercase English letters."], "statementHi": "String <code>s</code> me se length 3 ke aise kitne substrings hain jinke teeno characters aapas me alag-alag (distinct) hain?", "memoryFlow": "s = \"x  y  z  z  a  z\"\nWindow 1: \"xyz\" -> x != y, y != z, x != z -> GOOD! (count = 1)\nWindow 2: \"yzz\" -> z repeated -> BAD\nWindow 3: \"zza\" -> z repeated -> BAD\nWindow 4: \"zaz\" -> z repeated -> BAD\nTotal Good = 1", "memoryTip": "K = 3 itna chhota hai ki direct 3 comparisons (a != b && b != c && a != c) se O(1) me bina hash map ke check ho jata hai!", "intuition": "Kunki window size exactly 3 hai:\nHar index <code>i</code> (jahan <code>i >= 2</code>) ke liye pichle 3 characters dekho:\n<code>a = s[i-2], b = s[i-1], c = s[i]</code>.\nAgar <code>a != b && b != c && a != c</code>, toh count increment kar do.", "pitfalls": ["String length < 3 ho toh loop chalega hi nahi, seedhe 0 return karo."], "java": "class Solution {\n    public int countGoodSubstrings(String s) {\n        if (s == null || s.length() < 3) return 0;\n\n        int goodCount = 0;\n        char[] arr = s.toCharArray();\n\n        for (int i = 2; i < arr.length; i++) {\n            char a = arr[i - 2];\n            char b = arr[i - 1];\n            char c = arr[i];\n\n            // Teeno characters distinct hone chahiye\n            if (a != b && b != c && a != c) {\n                goodCount++;\n            }\n        }\n\n        return goodCount;\n    }\n}", "python": "class Solution:\n    def countGoodSubstrings(self, s: str) -> int:\n        if len(s) < 3:\n            return 0\n\n        count = 0\n        for i in range(2, len(s)):\n            a, b, c = s[i - 2], s[i - 1], s[i]\n            if a != b and b != c and a != c:\n                count += 1\n\n        return count"}, {"id": 5, "lc": 3, "premium": false, "title": "Longest Substring Without Repeating Characters", "difficulty": "Medium", "pattern": "Variable-Size Window (Hash Map / Set)", "time": "O(N)", "space": "O(min(M, N))", "statement": "Given a string <code>s</code>, find the length of the <b>longest substring</b> without duplicate characters.", "examples": [{"input": "s = \"abcabcbb\"", "output": "3", "explain": "The answer is \"abc\", with the length of 3."}, {"input": "s = \"bbbbb\"", "output": "1", "explain": "The answer is \"b\", with the length of 1."}, {"input": "s = \"pwwkew\"", "output": "3", "explain": "The answer is \"wke\", with the length of 3. Notice \"pwke\" is a subsequence and not a substring."}], "constraints": ["0 <= s.length <= 5 * 10^4", "s consists of English letters, digits, symbols and spaces."], "statementHi": "String <code>s</code> me sabse lamba aisa continuous tukda (substring) dhoondo jisme koi bhi character repeat na ho raha ho.", "memoryFlow": "s = \"a  b  c  a  b  c  b  b\"\n     L        R\nWindow: [a, b, c] -> len 3\nNext R arrives at 'a' (duplicate!):\nShrink L past the previous 'a' -> L jumps to index 1 ('b')\nWindow now: [b, c, a] -> len 3\nMax Len = 3", "memoryTip": "Map me character ke sath uska last seen INDEX store karo. Duplicate milne par L seedhe jump karega: left = max(left, lastSeen[c] + 1).", "intuition": "<b>Variable Window approach:</b>\nHum window <code>[left .. right]</code> maintain karte hain jisme saare characters unique hain.\nJab <code>s[right]</code> already hamare map me exist karta hai aur uska pichla index $\\ge left$ hai, toh hum left pointer ko seedhe <code>lastSeen[ch] + 1</code> par jump kara sakte hain.\nHar step par <code>maxLen = max(maxLen, right - left + 1)</code> update karte hain.", "pitfalls": ["Jump karte waqt <code>Math.max(left, map.get(ch) + 1)</code> zaroor lagayein, warna left peeche ki taraf chala jayega agar duplicate window se bahar ka ho!", "Character ASCII 128 (spaces, punctuation) tak ho sakte hain, isliye sirf a-z mat assume karo."], "java": "import java.util.*;\n\nclass Solution {\n    public int lengthOfLongestSubstring(String s) {\n        if (s == null || s.length() == 0) return 0;\n\n        // Character -> uska last dekha gaya index\n        Map<Character, Integer> lastSeen = new HashMap<>();\n        int left = 0;\n        int maxLen = 0;\n\n        for (int right = 0; right < s.length(); right++) {\n            char c = s.charAt(right);\n\n            // Agar character pehle dekha hai aur wo current window ke andar hai\n            if (lastSeen.containsKey(c)) {\n                // left ko duplicate ke agle index par le jao\n                left = Math.max(left, lastSeen.get(c) + 1);\n            }\n\n            lastSeen.put(c, right);\n            maxLen = Math.max(maxLen, right - left + 1);\n        }\n\n        return maxLen;\n    }\n}", "python": "class Solution:\n    def lengthOfLongestSubstring(self, s: str) -> int:\n        last_seen = {}\n        left = 0\n        max_len = 0\n\n        for right, ch in enumerate(s):\n            # Duplicate character window ke andar mila?\n            if ch in last_seen and last_seen[ch] >= left:\n                left = last_seen[ch] + 1\n\n            last_seen[ch] = right\n            max_len = max(max_len, right - left + 1)\n\n        return max_len"}, {"id": 6, "lc": 424, "premium": false, "title": "Longest Repeating Character Replacement", "difficulty": "Medium", "pattern": "Variable-Size Window (Max Frequency Count)", "time": "O(N)", "space": "O(1)", "statement": "You are given a string <code>s</code> and an integer <code>k</code>. You can choose any character of the string and change it to any other uppercase English character. You can perform this operation at most <code>k</code> times.<br>Return the length of the longest substring containing the same letter you can get after performing the above operations.", "examples": [{"input": "s = \"ABAB\", k = 2", "output": "4", "explain": "Replace the two \"A\"s with two \"B\"s or vice versa to get \"BBBB\" or \"AAAA\"."}, {"input": "s = \"AABABBA\", k = 1", "output": "4", "explain": "Replace the one \"A\" in the middle with \"B\" and form \"AABBBBA\". Substring \"BBBB\" has length 4."}], "constraints": ["1 <= s.length <= 10^5", "s consists of only uppercase English letters.", "0 <= k <= s.length"], "statementHi": "String me tum maximum <code>k</code> characters ko badal sakte ho kisi bhi dusre letter me. Badal kar kisi ek character ka lagatar sabse lamba substring kitne length ka banaya ja sakta hai?", "memoryFlow": "Window length = (right - left + 1)\nMax frequency character in window = maxCount\nCharacters that MUST be replaced = Window length - maxCount\n\nCondition for valid window:\n(right - left + 1) - maxCount <= k\n\nAgar replacement count > k ho jaye:\nShrink window from left!", "memoryTip": "Golden equation: (Window Size - Max Frequency) <= K. Agar replacements k se zyada mang rahe hain, window invalid hai!", "intuition": "<b>Core Math Insight:</b>\nAgar window ka size $W$ hai, aur us window me sabse zyada aane wala character $maxCount$ baar aaya hai, toh baaki bache hue characters ki sankhya $(W - maxCount)$ hogi.\nInhi $(W - maxCount)$ characters ko hume replace karna padega.\n- Agar $(W - maxCount) \\le k$, toh window <b>VALID</b> hai!\n- Agar $(W - maxCount) > k$, toh window <b>INVALID</b> hai, <code>left</code> ko aage badhao.\n\n<b>Smart optimization:</b> `maxCount` ko window shrink karte waqt decrement karne ki zaroorat nahi hoti, kyunki answer tabhi badhega jab `maxCount` apne historical maximum se bhi bada hoga!", "pitfalls": ["Window shrink karte waqt maxCount ko recalculate karne me O(26) lagta hai, par bina recalculate kiye bhi O(N) me optimal answer milta hai.", "Only uppercase letters guaranteed hain, so size 26 array `int[26]` is sufficient."], "java": "class Solution {\n    public int characterReplacement(String s, int k) {\n        int[] count = new int[26];\n        int left = 0;\n        int maxFreq = 0;\n        int maxLen = 0;\n\n        for (int right = 0; right < s.length(); right++) {\n            // Right character ki frequency badhao\n            int idx = s.charAt(right) - 'A';\n            count[idx]++;\n            maxFreq = Math.max(maxFreq, count[idx]);\n\n            // Window size - maxFreq = kitne characters replace karne padenge\n            // Agar replacement k se zyada ho gaye toh window shrink karo\n            while ((right - left + 1) - maxFreq > k) {\n                count[s.charAt(left) - 'A']--;\n                left++;\n            }\n\n            maxLen = Math.max(maxLen, right - left + 1);\n        }\n\n        return maxLen;\n    }\n}", "python": "class Solution:\n    def characterReplacement(self, s: str, k: int) -> int:\n        count = {}\n        left = 0\n        max_freq = 0\n        max_len = 0\n\n        for right in range(len(s)):\n            ch = s[right]\n            count[ch] = count.get(ch, 0) + 1\n            max_freq = max(max_freq, count[ch])\n\n            # Agar replace karne wale characters k se zyada ho jayein\n            while (right - left + 1) - max_freq > k:\n                count[s[left]] -= 1\n                left += 1\n\n            max_len = max(max_len, right - left + 1)\n\n        return max_len"}, {"id": 7, "lc": 567, "premium": false, "title": "Permutation in String", "difficulty": "Medium", "pattern": "Fixed-Size Window (Frequency Matching)", "time": "O(N)", "space": "O(1)", "statement": "Given two strings <code>s1</code> and <code>s2</code>, return <code>true</code> if <code>s2</code> contains a <b>permutation</b> of <code>s1</code>, or <code>false</code> otherwise.<br>In other words, return <code>true</code> if one of <code>s1</code>'s permutations is the substring of <code>s2</code>.", "examples": [{"input": "s1 = \"ab\", s2 = \"eidbaooo\"", "output": "true", "explain": "s2 contains one permutation of s1 (\"ba\")."}, {"input": "s1 = \"ab\", s2 = \"eidboaoo\"", "output": "false", "explain": "None of the permutations of s1 appear as a substring in s2."}], "constraints": ["1 <= s1.length, s2.length <= 10^4", "s1 and s2 consist of lowercase English letters."], "statementHi": "Kya <code>s2</code> ke andar <code>s1</code> ka koi permutation (koi bhi anagram) continuous substring ke roop me maujood hai? True ya false batao.", "memoryFlow": "s1 = \"ab\" (len = 2, freq: a:1, b:1)\ns2 = \"e  i  d  b  a  o  o  o\"\n[e, i] -> no match\n   [i, d] -> no match\n      [d, b] -> no match\n         [b, a] -> MATCH! (freq: a:1, b:1 matches s1) -> Return TRUE!", "memoryTip": "Permutation ka matlab hai exact same character frequencies. Window size humesha s1.length() ke barabar fix rakho!", "intuition": "<b>Fixed Window matching:</b>\n`s1` ka permutation hone ke liye kisi substring ka length exactly <code>s1.length()</code> hona chahiye aur dono ke character frequencies exact match hone chahiye.\n1. `s1` ki frequency array `count1[26]` banao.\n2. `s2` me size `s1.length()` ki window maintain karo `count2[26]`.\n3. Har step par check karo kya `Arrays.equals(count1, count2)`.\n4. Ek step aage slide karte waqt:\n   `count2[s2[i]]++` aur `count2[s2[i - k]]--`.", "pitfalls": ["Agar `s1.length() > s2.length()`, toh permutation possible hi nahi hai, seedhe false return karo.", "Arrays compare karte waqt direct == mat karo, `Arrays.equals()` karo."], "java": "import java.util.Arrays;\n\nclass Solution {\n    public boolean checkInclusion(String s1, String s2) {\n        int n1 = s1.length();\n        int n2 = s2.length();\n        if (n1 > n2) return false;\n\n        int[] count1 = new int[26];\n        int[] count2 = new int[26];\n\n        // Pehli window build karo\n        for (int i = 0; i < n1; i++) {\n            count1[s1.charAt(i) - 'a']++;\n            count2[s2.charAt(i) - 'a']++;\n        }\n\n        if (Arrays.equals(count1, count2)) return true;\n\n        // Window slide karo\n        for (int i = n1; i < n2; i++) {\n            count2[s2.charAt(i) - 'a']++;      // Expand right\n            count2[s2.charAt(i - n1) - 'a']--; // Shrink left\n\n            if (Arrays.equals(count1, count2)) return true;\n        }\n\n        return false;\n    }\n}", "python": "class Solution:\n    def checkInclusion(self, s1: str, s2: str) -> bool:\n        n1, n2 = len(s1), len(s2)\n        if n1 > n2:\n            return False\n\n        c1 = [0] * 26\n        c2 = [0] * 26\n\n        for i in range(n1):\n            c1[ord(s1[i]) - ord('a')] += 1\n            c2[ord(s2[i]) - ord('a')] += 1\n\n        if c1 == c2:\n            return True\n\n        for i in range(n1, n2):\n            c2[ord(s2[i]) - ord('a')] += 1\n            c2[ord(s2[i - n1]) - ord('a')] -= 1\n            if c1 == c2:\n                return True\n\n        return False"}, {"id": 8, "lc": 1004, "premium": false, "title": "Max Consecutive Ones III", "difficulty": "Medium", "pattern": "Variable-Size Window (At Most K Zeros)", "time": "O(N)", "space": "O(1)", "statement": "Given a binary array <code>nums</code> and an integer <code>k</code>, return the maximum number of consecutive <code>1</code>'s in the array if you can flip at most <code>k</code> <code>0</code>'s.", "examples": [{"input": "nums = [1,1,1,0,0,0,1,1,1,1,0], k = 2", "output": "6", "explain": "[1,1,1,0,0,1,1,1,1,1,1] - Numbers were flipped from index 5 to 10."}, {"input": "nums = [0,0,1,1,0,0,1,1,1,0,1,1,0,0,0,1,1,1,1], k = 3", "output": "10", "explain": "Flipping 3 zeros gives a contiguous sequence of ten 1's."}], "constraints": ["1 <= nums.length <= 10^5", "nums[i] is either 0 or 1.", "0 <= k <= nums.length"], "statementHi": "Binary array me maximum kitne lagatar 1 ban sakte hain agar tum jyada se jyada <code>k</code> zeroes ko 1 me flip kar sako?", "memoryFlow": "nums = [ 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 0 ], k = 2\nWindow me zeros count karo:\n[ 1, 1, 1, 0, 0 ] -> 2 zeros <= k (len = 5)\nAgla 0 aaya -> 3 zeros > k (INVALID!)\nShrink L until zeros <= 2: L moves past the first 0!\nWindow stays valid. Max length = 6.", "memoryTip": "Question ko rephrase karo: 'Find the longest subarray containing AT MOST K zeros!'", "intuition": "<b>Rephrasing the Problem:</b>\n'Flip at most k zeros to 1' ka simple matlab hai: aisa sabse lamba subarray dhoondo jisme <b>zyada se zyada k zeros</b> hon.\n1. `zeroCount` maintain karo.\n2. Right pointer aage badhao. Agar `nums[right] == 0`, `zeroCount++`.\n3. Jab `zeroCount > k` ho jaye, `left` pointer tab tak aage badhao jab tak ek zero bahar na nikal jaye (`nums[left] == 0` -> `zeroCount--`).\n4. Har step par `maxLen = max(maxLen, right - left + 1)`.\n\nComplexity: O(N) time kyunki L aur R dono at most N steps chalte hain.", "pitfalls": ["k = 0 ho sakta hai (zero flip allowed nahi), toh window me ek bhi 0 aate hi shrink hona chahiye.", "Shrink karte waqt `while` loop condition me `zeroCount > k` use karein."], "java": "class Solution {\n    public int longestOnes(int[] nums, int k) {\n        int left = 0;\n        int zeroCount = 0;\n        int maxLen = 0;\n\n        for (int right = 0; right < nums.length; right++) {\n            // Naya element 0 hai toh counter badhao\n            if (nums[right] == 0) {\n                zeroCount++;\n            }\n\n            // Window me agar k se zyada zeros ho gaye, shrink karo\n            while (zeroCount > k) {\n                if (nums[left] == 0) {\n                    zeroCount--;\n                }\n                left++;\n            }\n\n            maxLen = Math.max(maxLen, right - left + 1);\n        }\n\n        return maxLen;\n    }\n}", "python": "class Solution:\n    def longestOnes(self, nums: list[int], k: int) -> int:\n        left = 0\n        zero_count = 0\n        max_len = 0\n\n        for right in range(len(nums)):\n            if nums[right] == 0:\n                zero_count += 1\n\n            # At most k zeros allowed in window\n            while zero_count > k:\n                if nums[left] == 0:\n                    zero_count -= 1\n                left += 1\n\n            max_len = max(max_len, right - left + 1)\n\n        return max_len"}, {"id": 9, "lc": 904, "premium": false, "title": "Fruit Into Baskets", "difficulty": "Medium", "pattern": "Variable-Size Window (At Most 2 Distinct Types)", "time": "O(N)", "space": "O(1)", "statement": "You are visiting a farm that has a single row of fruit trees arranged from left to right. You are given an integer array <code>fruits</code> where <code>fruits[i]</code> is the <b>type</b> of fruit the <code>i<sup>th</sup></code> tree produces.<br>You have <b>two baskets</b>, and each basket can only hold a <b>single type</b> of fruit. There is no limit on the amount of fruit each basket can hold.<br>Starting from any tree, you must pick <b>exactly one fruit from every tree</b> (including the start tree) while moving to the right. The moment you reach a tree with fruit that cannot fit in your baskets, you must stop.<br>Return the <b>maximum number of fruits</b> you can pick.", "examples": [{"input": "fruits = [1,2,1]", "output": "3", "explain": "We can pick from all 3 trees."}, {"input": "fruits = [0,1,2,2]", "output": "3", "explain": "We can pick from trees [1,2,2]. If we started at first tree, we would stop at tree 2."}, {"input": "fruits = [1,2,3,2,2]", "output": "4", "explain": "We can pick from trees [2,3,2,2]. If we had started at the first tree, we would only pick from [1,2]."}], "constraints": ["1 <= fruits.length <= 10^5", "0 <= fruits[i] < fruits.length"], "statementHi": "Tumhare paas 2 tokriyan (baskets) hain aur har tokri me sirf ek hi type ka fruit aa sakta hai. Lagatar pedon se fruit todte huye chalna hai. Maximum kitne fruits tod sakte ho?", "memoryFlow": "fruits = [ 1, 2, 3, 2, 2 ]\nBaskets hold at most 2 fruit types!\n\nR=0 (1): basket = {1:1} (types=1)\nR=1 (2): basket = {1:1, 2:1} (types=2)\nR=2 (3): basket = {1:1, 2:1, 3:1} (types=3 > 2! INVALID)\nShrink L: remove 1 -> basket = {2:1, 3:1} (types=2)\nR=3 (2): basket = {2:2, 3:1}\nR=4 (2): basket = {2:3, 3:1}\nMax picked = 4 (trees [2,3,2,2])", "memoryTip": "Real problem: 'Find the longest contiguous subarray with AT MOST 2 DISTINCT integers!'", "intuition": "<b>Pattern: Longest Subarray with at most 2 distinct elements:</b>\n1. Map `basket` use karo jo `fruitType -> count` store kare.\n2. `right` pointer aage badhao aur `basket[fruits[right]]++`.\n3. Agar `basket.size() > 2` ho jaye, toh `left` pointer tab tak aage badhao jab tak koi ek fruit type poori tarah 0 hokar map se remove na ho jaye (`basket.remove(fruits[left])`).\n4. Har step par `maxFruits = max(maxFruits, right - left + 1)` update karo.", "pitfalls": ["Map me count 0 hone par key ko `remove()` karna mat bhooliye, warna `map.size()` 3 hi reh jayegi!", "At most 2 distinct fruit types hain, isliye map me at most 3 entries hi rahengi -> O(1) auxiliary space."], "java": "import java.util.*;\n\nclass Solution {\n    public int totalFruit(int[] fruits) {\n        // fruitType -> count in current window\n        Map<Integer, Integer> basket = new HashMap<>();\n        int left = 0;\n        int maxFruits = 0;\n\n        for (int right = 0; right < fruits.length; right++) {\n            int f = fruits[right];\n            basket.put(f, basket.getOrDefault(f, 0) + 1);\n\n            // Agar 2 se zyada fruit types aa gaye, shrink karo\n            while (basket.size() > 2) {\n                int leftFruit = fruits[left];\n                basket.put(leftFruit, basket.get(leftFruit) - 1);\n                if (basket.get(leftFruit) == 0) {\n                    basket.remove(leftFruit); // Zaroori: size kam karne ke liye\n                }\n                left++;\n            }\n\n            maxFruits = Math.max(maxFruits, right - left + 1);\n        }\n\n        return maxFruits;\n    }\n}", "python": "from collections import defaultdict\n\nclass Solution:\n    def totalFruit(self, fruits: list[int]) -> int:\n        basket = defaultdict(int)\n        left = 0\n        max_fruits = 0\n\n        for right in range(len(fruits)):\n            basket[fruits[right]] += 1\n\n            # Jab tak 2 se zyada types hain, left se fruit nikalo\n            while len(basket) > 2:\n                basket[fruits[left]] -= 1\n                if basket[fruits[left]] == 0:\n                    del basket[fruits[left]]\n                left += 1\n\n            max_fruits = max(max_fruits, right - left + 1)\n\n        return max_fruits"}, {"id": 10, "lc": 209, "premium": false, "title": "Minimum Size Subarray Sum", "difficulty": "Medium", "pattern": "Variable-Size Window (Shortest Valid Subarray)", "time": "O(N)", "space": "O(1)", "statement": "Given an array of positive integers <code>nums</code> and a positive integer <code>target</code>, return the <b>minimal length</b> of a contiguous subarray whose sum is <b>greater than or equal to</b> <code>target</code>. If there is no such subarray, return <code>0</code> instead.", "examples": [{"input": "target = 7, nums = [2,3,1,2,4,3]", "output": "2", "explain": "The subarray [4,3] has the minimal length under the problem constraint."}, {"input": "target = 4, nums = [1,4,4]", "output": "1", "explain": "Subarray [4] has length 1 >= 4."}, {"input": "target = 11, nums = [1,1,1,1,1,1,1,1]", "output": "0", "explain": "Total sum is 8 < 11, so return 0."}], "constraints": ["1 <= target <= 10^9", "1 <= nums.length <= 10^5", "1 <= nums[i] <= 10^4"], "statementHi": "Positive numbers ka array diya hai. Aisa sabse CHHOTA continuous tukda (subarray) nikalo jiska sum kam se kam <code>target</code> ke barabar ya bada ho. Agar koi aisa tukda nahi hai toh 0 return karo.", "memoryFlow": "target = 7, nums = [ 2, 3, 1, 2, 4, 3 ]\nExpand R until sum >= 7:\n[2, 3, 1, 2] -> sum = 8 >= 7 (len = 4)\nShrink L: remove 2 -> [3, 1, 2] sum = 6 < 7\nExpand R: [3, 1, 2, 4] -> sum = 10 >= 7 (len = 4)\nShrink L: remove 3 -> [1, 2, 4] sum = 7 >= 7 (len = 3)\nShrink L: remove 1 -> [2, 4] sum = 6 < 7\nExpand R: [2, 4, 3] -> sum = 9 >= 7 (len = 3)\nShrink L: remove 2 -> [4, 3] sum = 7 >= 7 (len = 2! MIN)\n\nResult = 2", "memoryTip": "Shortest window me logic ulta hota hai: jab window VALID ho (sum >= target), tab length minimize karo aur L++ karo!", "intuition": "<b>Shortest Window Blueprint:</b>\n1. `right` pointer ko badhakar `currentSum` me add karte jao.\n2. Jaise hi `currentSum >= target` ban jaye:\n   - Window valid ho gayi! `minLen = min(minLen, right - left + 1)` record karo.\n   - Ab dekho kya `left` ko hata kar window ko aur chhota banaya ja sakta hai: `currentSum -= nums[left]`, `left++`.\n   - Ye `while (currentSum >= target)` loop tab tak chalega jab tak sum target se kam na ho jaye.\n3. Agar loop khatam hone ke baad bhi `minLen` update nahi hua, toh `0` return karo.", "pitfalls": ["Agar poore array ka sum bhi target se chhota ho, toh `minLen` update nahi hoga aur 0 return hona chahiye.", "Numbers strictly positive hain, isliye monotonic window expansion aur shrinking work karta hai. (Negative numbers par Prefix Sum + Monotonic Deque lagta hai, jaise LC 862)."], "java": "class Solution {\n    public int minSubArrayLen(int target, int[] nums) {\n        int left = 0;\n        long currentSum = 0;\n        int minLen = Integer.MAX_VALUE;\n\n        for (int right = 0; right < nums.length; right++) {\n            currentSum += nums[right];\n\n            // Jab tak sum >= target hai, length chhota karne ki koshish karo\n            while (currentSum >= target) {\n                minLen = Math.min(minLen, right - left + 1);\n                currentSum -= nums[left];\n                left++;\n            }\n        }\n\n        return minLen == Integer.MAX_VALUE ? 0 : minLen;\n    }\n}", "python": "class Solution:\n    def minSubArrayLen(self, target: int, nums: list[int]) -> int:\n        left = 0\n        curr_sum = 0\n        min_len = float('inf')\n\n        for right in range(len(nums)):\n            curr_sum += nums[right]\n\n            # Condition satisfy hote hi minimize karne ki koshish karo\n            while curr_sum >= target:\n                min_len = min(min_len, right - left + 1)\n                curr_sum -= nums[left]\n                left += 1\n\n        return 0 if min_len == float('inf') else min_len"}, {"id": 11, "lc": 438, "premium": false, "title": "Find All Anagrams in a String", "difficulty": "Medium", "pattern": "Fixed-Size Window (Anagram Frequency Matching)", "time": "O(N)", "space": "O(1)", "statement": "Given two strings <code>s</code> and <code>p</code>, return an array of all the <b>start indices</b> of <code>p</code>'s anagrams in <code>s</code>. You may return the answer in <b>any order</b>.", "examples": [{"input": "s = \"cbaebabacd\", p = \"abc\"", "output": "[0,6]", "explain": "The substring with start index = 0 is \"cba\", which is an anagram of \"abc\". The substring with start index = 6 is \"bac\", which is an anagram of \"abc\"."}, {"input": "s = \"abab\", p = \"ab\"", "output": "[0,1,2]", "explain": "The substring with start index = 0 is \"ab\", anagram of \"ab\". Start index = 1 is \"ba\", anagram of \"ab\". Start index = 2 is \"ab\", anagram of \"ab\"."}], "constraints": ["1 <= s.length, p.length <= 3 * 10^4", "s and p consist of lowercase English letters."], "statementHi": "String <code>s</code> ke andar aise saare start indices dhoondo jahan se shuru hone wala tukda <code>p</code> ka ek anagram (same letters aur same frequency) ho.", "memoryFlow": "s = \"c  b  a  e  b  a  b  a  c  d\", p = \"abc\" (len = 3)\nWindow size = 3\n\n[c, b, a] at index 0 -> freq matches \"abc\" -> record 0\n[b, a, e] at index 1 -> 'e' is extra -> no\n[a, e, b] at index 2 -> no\n...\n[b, a, c] at index 6 -> freq matches \"abc\" -> record 6\nOutput: [0, 6]", "memoryTip": "Size fix hai: p.length(). Har kadam par purana character left se bahar (freq--) aur naya right se andar (freq++). Match hone par index (i - k + 1) result me daalo.", "intuition": "<b>Pattern: Fixed Window Frequency Match:</b>\nAnagrams ka matlab hota hai dono strings ke character frequencies ka identical hona.\n1. `p` ka character frequency array `pCount[26]` bana lo.\n2. `s` ke pehle `p.length()` characters se `sCount[26]` banao.\n3. Agar `Arrays.equals(pCount, sCount)`, toh index `0` ko result list me daal do.\n4. Ab window ko ek-ek step aage slide karo:\n   - `sCount[s.charAt(i) - 'a']++` (right add)\n   - `sCount[s.charAt(i - k) - 'a']--` (left remove)\n   - Agar frequency match ho jaye, toh start index `i - k + 1` result me add karo.", "pitfalls": ["Agar `s.length() < p.length()`, toh koi bhi anagram possible nahi hai -> return empty list.", "Record hone wala start index `i - k + 1` hota hai jab right pointer `i` par ho."], "java": "import java.util.*;\n\nclass Solution {\n    public List<Integer> findAnagrams(String s, String p) {\n        List<Integer> result = new ArrayList<>();\n        int ns = s.length();\n        int np = p.length();\n        if (ns < np) return result;\n\n        int[] pCount = new int[26];\n        int[] sCount = new int[26];\n\n        for (int i = 0; i < np; i++) {\n            pCount[p.charAt(i) - 'a']++;\n            sCount[s.charAt(i) - 'a']++;\n        }\n\n        if (Arrays.equals(pCount, sCount)) {\n            result.add(0);\n        }\n\n        // Slide window of size np\n        for (int i = np; i < ns; i++) {\n            sCount[s.charAt(i) - 'a']++;        // add right\n            sCount[s.charAt(i - np) - 'a']--;   // remove left\n\n            if (Arrays.equals(pCount, sCount)) {\n                result.add(i - np + 1);\n            }\n        }\n\n        return result;\n    }\n}", "python": "class Solution:\n    def findAnagrams(self, s: str, p: str) -> list[int]:\n        ns, np = len(s), len(p)\n        if ns < np:\n            return []\n\n        p_count = [0] * 26\n        s_count = [0] * 26\n\n        for i in range(np):\n            p_count[ord(p[i]) - ord('a')] += 1\n            s_count[ord(s[i]) - ord('a')] += 1\n\n        res = []\n        if p_count == s_count:\n            res.append(0)\n\n        for i in range(np, ns):\n            s_count[ord(s[i]) - ord('a')] += 1\n            s_count[ord(s[i - np]) - ord('a')] -= 1\n\n            if p_count == s_count:\n                res.append(i - np + 1)\n\n        return res"}, {"id": 12, "lc": 1343, "premium": false, "title": "Number of Sub-arrays of Size K and Average Greater than or Equal to Threshold", "difficulty": "Medium", "pattern": "Fixed-Size Window (Sum >= K * Threshold)", "time": "O(N)", "space": "O(1)", "statement": "Given an array of integers <code>arr</code> and two integers <code>k</code> and <code>threshold</code>, return the number of sub-arrays of size <code>k</code> and average greater than or equal to <code>threshold</code>.", "examples": [{"input": "arr = [2,2,2,2,5,5,5,8], k = 3, threshold = 4", "output": "3", "explain": "Sub-arrays [2,5,5],[5,5,5] and [5,5,8] have averages 4, 5 and 6 respectively. All other sub-arrays of size 3 have averages less than 4."}, {"input": "arr = [11,13,17,23,29,31,7,5,2,3], k = 3, threshold = 5", "output": "6", "explain": "The first 6 sub-arrays of size 3 have averages greater than 5; the last 4 do not."}], "constraints": ["1 <= arr.length <= 10^5", "1 <= k <= arr.length", "0 <= threshold <= 10^4", "1 <= arr[i] <= 10^4"], "statementHi": "Array me se aise kitne <code>k</code> size ke continuous subarrays hain jinka average kam se kam <code>threshold</code> ke barabar ya bada ho?", "memoryFlow": "Threshold = 4, k = 3\nCondition: avg >= threshold  ===>  sum >= k * threshold (sum >= 3 * 4 = 12)\n\n[2, 2, 2] -> sum = 6 < 12\n[2, 2, 5] -> sum = 9 < 12\n[2, 5, 5] -> sum = 12 >= 12  -> Count = 1\n[5, 5, 5] -> sum = 15 >= 12  -> Count = 2\n[5, 5, 8] -> sum = 18 >= 12  -> Count = 3\n\nTotal Count = 3", "memoryTip": "Formula trick: 'sum / k >= threshold' likhne ke bajaye 'sum >= k * threshold' likho taaki float division se bacha ja sake!", "intuition": "<b>Avoiding Floating Points:</b>\nAverage $\\ge threshold \\iff \frac{sum}{k} \\ge threshold \\iff sum \\ge k \times threshold$.\nIsse hum target sum $targetSum = k \times threshold$ pehle hi nikal lete hain.\n1. Pehle $k$ elements ka sum calculate karo. Agar $sum \\ge targetSum$, `count++`.\n2. Phir array me slide karo:\n   `sum += arr[i] - arr[i - k]`.\n   Agar $sum \\ge targetSum$, `count++`.\n3. Return `count`.", "pitfalls": ["Integer division `sum / k >= threshold` mat use karein kyunki decimal truncation galat answer de sakta hai (e.g. 11 / 3 = 3 ho jata hai jabki 3.66 hota hai)."], "java": "class Solution {\n    public int numOfSubarrays(int[] arr, int k, int threshold) {\n        int targetSum = k * threshold; // Division se bachne ke liye\n        int currentSum = 0;\n        int count = 0;\n\n        // Pehli window\n        for (int i = 0; i < k; i++) {\n            currentSum += arr[i];\n        }\n\n        if (currentSum >= targetSum) {\n            count++;\n        }\n\n        // Slide karo\n        for (int i = k; i < arr.length; i++) {\n            currentSum += arr[i] - arr[i - k];\n            if (currentSum >= targetSum) {\n                count++;\n            }\n        }\n\n        return count;\n    }\n}", "python": "class Solution:\n    def numOfSubarrays(self, arr: list[int], k: int, threshold: int) -> int:\n        target_sum = k * threshold\n        curr_sum = sum(arr[:k])\n        count = 1 if curr_sum >= target_sum else 0\n\n        for i in range(k, len(arr)):\n            curr_sum += arr[i] - arr[i - k]\n            if curr_sum >= target_sum:\n                count += 1\n\n        return count"}, {"id": 13, "lc": 1423, "premium": false, "title": "Maximum Points You Can Obtain from Cards", "difficulty": "Medium", "pattern": "Inverse Sliding Window (Minimize Subarray of Size N - K)", "time": "O(N)", "space": "O(1)", "statement": "There are several cards arranged in a row, and each card has an associated number of points. In one step, you can take one card from the <b>beginning</b> or from the <b>end</b> of the row. You have to take exactly <code>k</code> cards.<br>Your score is the sum of the points of the cards you have taken.<br>Given the integer array <code>cardPoints</code> and the integer <code>k</code>, return the <b>maximum score</b> you can obtain.", "examples": [{"input": "cardPoints = [1,2,3,4,5,6,1], k = 3", "output": "12", "explain": "Pick cards from ends: [1] (right), [6] (right), [5] (right) -> 1 + 6 + 5 = 12."}, {"input": "cardPoints = [2,2,2], k = 2", "output": "4", "explain": "Regardless of which cards you take, your score will always be 4."}, {"input": "cardPoints = [9,7,7,9,7,7,9], k = 7", "output": "55", "explain": "You have to take all the cards. Your score is the sum of all cards."}], "constraints": ["1 <= cardPoints.length <= 10^5", "1 <= cardPoints[i] <= 10^4", "1 <= k <= cardPoints.length"], "statementHi": "Row me cards rakhe hain. Har baar tum ya toh bilkul shuru se ya bilkul aakhri se ek card utha sakte ho. Total <code>k</code> cards lene hain. Maximum sum kitna bana sakte ho?", "memoryFlow": "Cards: [ 1,  2,  3,  4,  5,  6,  1 ], k = 3\nTotal cards = 7. If we pick 3 from ends,\nwe LEAVE (7 - 3 = 4) contiguous cards in the middle!\n\nTotal Sum = 1 + 2 + 3 + 4 + 5 + 6 + 1 = 22\nMiddle window of size 4:\n[ 1, 2, 3, 4 ] -> sum = 10 -> Taken from ends = 22 - 10 = 12\n[ 2, 3, 4, 5 ] -> sum = 14 -> Taken from ends = 22 - 14 = 8\n[ 3, 4, 5, 6 ] -> sum = 18 -> Taken from ends = 22 - 18 = 4\n[ 4, 5, 6, 1 ] -> sum = 16 -> Taken from ends = 22 - 16 = 6\n\nMin Middle Sum = 10  ===>  Max Ends Score = 22 - 10 = 12!", "memoryTip": "Inversion Trick: Shuru aur aakhri se K elements ka sum maximize karna == beech ke (N - K) elements ka sum minimize karna!", "intuition": "<b>Complement / Inverse Window Strategy:</b>\nJab hum dono ends se total $k$ cards chunenge, toh beech me ek continuous tukda bachega jiska size hamesha $(N - k)$ hoga.\nChunki Total Sum fixed hai:\n$$\text{Max Score from Ends} = \text{Total Sum} - \text{Min Subarray Sum of size } (N - k)$$\nAb ye sawaal ek simple **Fixed-Size Window of size $(N - k)$** ban gaya!", "pitfalls": ["Agar `k == cardPoints.length`, toh window size 0 ho jayega. Seedhe poora array sum return kar do.", "Middle window size `n - k` ko dhyaan se calculate karein."], "java": "class Solution {\n    public int maxScore(int[] cardPoints, int k) {\n        int n = cardPoints.length;\n        int totalSum = 0;\n        for (int p : cardPoints) totalSum += p;\n\n        // Agar saare cards uthane hain\n        if (k == n) return totalSum;\n\n        // Beech me bache hue elements ki window\n        int windowSize = n - k;\n        int currentWindowSum = 0;\n\n        for (int i = 0; i < windowSize; i++) {\n            currentWindowSum += cardPoints[i];\n        }\n\n        int minWindowSum = currentWindowSum;\n\n        for (int i = windowSize; i < n; i++) {\n            currentWindowSum += cardPoints[i] - cardPoints[i - windowSize];\n            minWindowSum = Math.min(minWindowSum, currentWindowSum);\n        }\n\n        return totalSum - minWindowSum;\n    }\n}", "python": "class Solution:\n    def maxScore(self, cardPoints: list[int], k: int) -> int:\n        n = len(cardPoints)\n        total_sum = sum(cardPoints)\n        if k == n:\n            return total_sum\n\n        win_size = n - k\n        curr_sum = sum(cardPoints[:win_size])\n        min_win_sum = curr_sum\n\n        for i in range(win_size, n):\n            curr_sum += cardPoints[i] - cardPoints[i - win_size]\n            min_win_sum = min(min_win_sum, curr_sum)\n\n        return total_sum - min_win_sum"}, {"id": 14, "lc": 1208, "premium": false, "title": "Get Equal Substrings Within Budget", "difficulty": "Medium", "pattern": "Variable-Size Window (Cost Sum <= MaxCost)", "time": "O(N)", "space": "O(1)", "statement": "You are given two strings <code>s</code> and <code>t</code> of the same length and an integer <code>maxCost</code>.<br>The cost to change the <code>i<sup>th</sup></code> character of <code>s</code> to that of <code>t</code> is <code>|s[i] - t[i]|</code>.<br>Return the maximum length of a substring of <code>s</code> that can be transformed into the corresponding substring of <code>t</code> with a cost less than or equal to <code>maxCost</code>.", "examples": [{"input": "s = \"abcd\", t = \"bcdf\", maxCost = 3", "output": "3", "explain": "\"abc\" of s can be transformed into \"bcd\" of t with cost 1 + 1 + 1 = 3 <= 3, length 3."}, {"input": "s = \"abcd\", t = \"cdef\", maxCost = 3", "output": "1", "explain": "Each character cost is 2, transforming 2 chars costs 4 > 3. Max length is 1."}, {"input": "s = \"abcd\", t = \"acde\", maxCost = 0", "output": "1", "explain": "You cannot make any changes, max length is 1 (index 0 matches with cost 0)."}], "constraints": ["1 <= s.length <= 10^5", "t.length == s.length", "0 <= maxCost <= 10^6", "s and t consist of lowercase English letters."], "statementHi": "Do barabar lambi strings <code>s</code> aur <code>t</code> di gayi hain. Ek character badalne ka kharcha <code>|s[i] - t[i]|</code> hota hai. Total budget <code>maxCost</code> ke andar sabse lamba substring kitni length ka convert kiya ja sakta hai?", "memoryFlow": "s = \"a  b  c  d\",  t = \"b  c  d  f\", maxCost = 3\nCost array: [ |a-b|, |b-c|, |c-d|, |d-f| ]\n          = [   1,     1,     1,     2   ]\n\nWindow:\n[ 1, 1, 1 ] -> cost = 3 <= 3 (len = 3)\nAdd 2: [ 1, 1, 1, 2 ] -> cost = 5 > 3 (Shrink L!)\nMax valid window length = 3", "memoryTip": "Is problem ko ek integer cost array maan lo: 'Find the longest subarray whose sum <= maxCost'.", "intuition": "<b>Transformation to Array Problem:</b>\nHar index par cost hoti hai $cost[i] = |s[i] - t[i]|$.\nHume aisa sabse lamba continuous subarray dhoondna hai jiska sum $\\le maxCost$ ho.\n1. `currentCost = 0`, `left = 0`, `maxLen = 0`.\n2. `right` pointer ko aage badhao aur `currentCost += abs(s[right] - t[right])`.\n3. Jab `currentCost > maxCost`, tab tak `left` badhao:\n   `currentCost -= abs(s[left] - t[left])`, `left++`.\n4. `maxLen = max(maxLen, right - left + 1)`.\n\nTotal time $O(N)$ with $O(1)$ auxiliary memory.", "pitfalls": ["Pehle se pura cost array create karne ki zaroorat nahi hai, on-the-fly character difference nikalne se $O(1)$ memory bachti hai.", "maxCost = 0 hone par cost 0 wale identical characters valid answer de sakte hain."], "java": "class Solution {\n    public int equalSubstring(String s, String t, int maxCost) {\n        int left = 0;\n        int currentCost = 0;\n        int maxLen = 0;\n        int n = s.length();\n\n        for (int right = 0; right < n; right++) {\n            currentCost += Math.abs(s.charAt(right) - t.charAt(right));\n\n            // Agar budget exceed ho gaya, shrink karo\n            while (currentCost > maxCost) {\n                currentCost -= Math.abs(s.charAt(left) - t.charAt(left));\n                left++;\n            }\n\n            maxLen = Math.max(maxLen, right - left + 1);\n        }\n\n        return maxLen;\n    }\n}", "python": "class Solution:\n    def equalSubstring(self, s: str, t: str, maxCost: int) -> int:\n        left = 0\n        curr_cost = 0\n        max_len = 0\n\n        for right in range(len(s)):\n            curr_cost += abs(ord(s[right]) - ord(t[right]))\n\n            # Budget exceed hote hi left shrink karo\n            while curr_cost > maxCost:\n                curr_cost -= abs(ord(s[left]) - ord(t[left]))\n                left += 1\n\n            max_len = max(max_len, right - left + 1)\n\n        return max_len"}, {"id": 15, "lc": 1456, "premium": false, "title": "Maximum Number of Vowels in a Substring of Given Length", "difficulty": "Medium", "pattern": "Fixed-Size Window (Vowel Counter)", "time": "O(N)", "space": "O(1)", "statement": "Given a string <code>s</code> and an integer <code>k</code>, return the maximum number of vowel letters in any substring of <code>s</code> with length <code>k</code>.<br>Vowel letters in English are <code>'a', 'e', 'i', 'o', 'u'</code>.", "examples": [{"input": "s = \"abciiidef\", k = 3", "output": "3", "explain": "The substring \"iii\" contains 3 vowel letters."}, {"input": "s = \"aeiou\", k = 2", "output": "2", "explain": "Any substring of length 2 contains 2 vowels."}, {"input": "s = \"leetcode\", k = 3", "output": "2", "explain": "\"lee\", \"eet\" and \"ode\" contain 2 vowels."}], "constraints": ["1 <= s.length <= 10^5", "s consists of lowercase English letters.", "1 <= k <= s.length"], "statementHi": "String <code>s</code> me se exactly <code>k</code> length ka aisa tukda nikalo jisme vowels (a, e, i, o, u) ki ginti sabse zyada ho.", "memoryFlow": "s = \"a  b  c  i  i  i  d  e  f\", k = 3\n[a, b, c] -> vowels = 1 ('a')\n   [b, c, i] -> vowels = 1 ('i')\n      [c, i, i] -> vowels = 2 ('i', 'i')\n         [i, i, i] -> vowels = 3 (MAX possible for k=3!) -> Early Exit!", "memoryTip": "Agar kisi window me vowel count == k ban jaye, toh usse bada answer physically possible nahi hai — seedhe return k kar do (Early Exit Optimization)!", "intuition": "<b>Classic Fixed-Size Window:</b>\n1. Helper function `isVowel(char c)` banao.\n2. Pehle $k$ characters me vowels count karo `vowels`.\n3. `maxVowels = vowels`. Agar `maxVowels == k` toh direct return `k`.\n4. Index $k$ se aage slide karo:\n   - Agar aane wala character vowel hai: `vowels++`\n   - Agar bahar nikalne wala character vowel tha: `vowels--`\n   - `maxVowels = max(maxVowels, vowels)`\n   - Early exit if `maxVowels == k`.\n5. Return `maxVowels`.", "pitfalls": ["Vowels set me lookup karne ke bajaye `c == 'a' || c == 'e' || ...` switch/if likhne se run-time speed 3x fast ho jati hai."], "java": "class Solution {\n    public int maxVowels(String s, int k) {\n        int vowels = 0;\n\n        // Pehli window\n        for (int i = 0; i < k; i++) {\n            if (isVowel(s.charAt(i))) vowels++;\n        }\n\n        int maxVowels = vowels;\n        if (maxVowels == k) return k; // Early exit\n\n        // Slide window\n        for (int i = k; i < s.length(); i++) {\n            if (isVowel(s.charAt(i))) vowels++;       // right add\n            if (isVowel(s.charAt(i - k))) vowels--;   // left remove\n\n            maxVowels = Math.max(maxVowels, vowels);\n            if (maxVowels == k) return k; // Max possible reached\n        }\n\n        return maxVowels;\n    }\n\n    private boolean isVowel(char c) {\n        return c == 'a' || c == 'e' || c == 'i' || c == 'o' || c == 'u';\n    }\n}", "python": "class Solution:\n    def maxVowels(self, s: str, k: int) -> int:\n        vowels_set = {'a', 'e', 'i', 'o', 'u'}\n        curr_vowels = sum(1 for ch in s[:k] if ch in vowels_set)\n        max_vowels = curr_vowels\n\n        if max_vowels == k:\n            return k\n\n        for i in range(k, len(s)):\n            if s[i] in vowels_set:\n                curr_vowels += 1\n            if s[i - k] in vowels_set:\n                curr_vowels -= 1\n\n            if curr_vowels > max_vowels:\n                max_vowels = curr_vowels\n                if max_vowels == k:\n                    return k\n\n        return max_vowels"}, {"id": 16, "lc": 713, "premium": false, "title": "Subarray Product Less Than K", "difficulty": "Medium", "pattern": "Variable-Size Window (Subarray Count Formula)", "time": "O(N)", "space": "O(1)", "statement": "Given an array of integers <code>nums</code> and an integer <code>k</code>, return the number of contiguous subarrays where the product of all the elements in the subarray is strictly less than <code>k</code>.", "examples": [{"input": "nums = [10,5,2,6], k = 100", "output": "8", "explain": "The 8 subarrays that have product less than 100 are: [10], [5], [2], [6], [10, 5], [5, 2], [2, 6], [5, 2, 6]. Note that [10, 5, 2] is not included since the product of 100 is not strictly less than k."}, {"input": "nums = [1,2,3], k = 0", "output": "0", "explain": "Product of positive integers cannot be less than 0."}], "constraints": ["1 <= nums.length <= 3 * 10^4", "1 <= nums[i] <= 1000", "0 <= k <= 10^6"], "statementHi": "Array me aise kitne continuous subarrays hain jinke saare numbers ka guna (product) strictly <code>k</code> se chhota ho?", "memoryFlow": "nums = [ 10, 5, 2, 6 ], k = 100\nR=0 (10): prod=10 < 100 -> valid window [10]. New subarrays ending at R=0: [10] -> count += (0-0+1) = 1\nR=1 (5):  prod=50 < 100 -> valid window [10, 5]. New ending at R=1: [5], [10, 5] -> count += (1-0+1) = 2\nR=2 (2):  prod=100 >= 100! (INVALID). Shrink L: remove 10 -> prod = 10 < 100.\n          Valid window [5, 2]. New ending at R=2: [2], [5, 2] -> count += (2-1+1) = 2\nR=3 (6):  prod=60 < 100 -> valid window [5, 2, 6]. New ending at R=3: [6], [2,6], [5,2,6] -> count += (3-1+1) = 3\n\nTotal Count = 1 + 2 + 2 + 3 = 8!", "memoryTip": "Formula: Har valid window [L..R] me right par end hone wale EXACT (right - left + 1) subarrays hote hain!", "intuition": "<b>Counting Subarrays Magic Formula:</b>\nJab window <code>[left .. right]</code> ka product strictly $< k$ ho jata hai, toh index `right` par END hone wale naye subarrays kitne bante hain?\n- `[nums[right]]`\n- `[nums[right-1], nums[right]]`\n- `...`\n- `[nums[left], ..., nums[right]]`\nInki kul sankhya exactly <b>(right - left + 1)</b> hoti hai!\nHar `right` ke sath hum `count += (right - left + 1)` jodte chalte hain.", "pitfalls": ["Agar `k <= 1`, toh product positive numbers ka kabhi bhi < 1 nahi ho sakta, seedhe `return 0` karna zaroori hai (warna infinite loop lag sakta hai)!", "Divide karte waqt `prod /= nums[left]` use karein."], "java": "class Solution {\n    public int numSubarrayProductLessThanK(int[] nums, int k) {\n        // Crucial edge case: numbers positive hain (>= 1), isliye product >= 1 rahega\n        if (k <= 1) return 0;\n\n        int left = 0;\n        int prod = 1;\n        int count = 0;\n\n        for (int right = 0; right < nums.length; right++) {\n            prod *= nums[right];\n\n            // Product >= k ho toh left ko aage badha kar shrink karo\n            while (prod >= k && left <= right) {\n                prod /= nums[left];\n                left++;\n            }\n\n            // Key formula: right par end hone wale valid subarrays\n            count += (right - left + 1);\n        }\n\n        return count;\n    }\n}", "python": "class Solution:\n    def numSubarrayProductLessThanK(self, nums: list[int], k: int) -> int:\n        if k <= 1:\n            return 0\n\n        left = 0\n        prod = 1\n        count = 0\n\n        for right in range(len(nums)):\n            prod *= nums[right]\n\n            while prod >= k and left <= right:\n                prod //= nums[left]\n                left += 1\n\n            count += (right - left + 1)\n\n        return count"}, {"id": 17, "lc": 340, "premium": true, "title": "Longest Substring with At Most K Distinct Characters", "difficulty": "Medium", "pattern": "Variable-Size Window (Hash Map Size <= K)", "time": "O(N)", "space": "O(K)", "statement": "Given a string <code>s</code> and an integer <code>k</code>, return the length of the <b>longest substring</b> of <code>s</code> that contains at most <code>k</code> <b>distinct characters</b>.", "examples": [{"input": "s = \"eceba\", k = 2", "output": "3", "explain": "The substring is \"ece\" with length 3."}, {"input": "s = \"aa\", k = 1", "output": "2", "explain": "The substring is \"aa\" with length 2."}], "constraints": ["1 <= s.length <= 5 * 10^4", "0 <= k <= 50"], "statementHi": "String <code>s</code> me se aisa sabse lamba tukda (substring) dhoondo jisme zyada se zyada <code>k</code> alag-alag (distinct) characters hon.", "memoryFlow": "s = \"e  c  e  b  a\", k = 2\nR=0 'e': map={'e':1} (distinct=1 <= 2)\nR=1 'c': map={'e':1, 'c':1} (distinct=2 <= 2)\nR=2 'e': map={'e':2, 'c':1} (distinct=2 <= 2) -> len = 3 (\"ece\")\nR=3 'b': map={'e':2, 'c':1, 'b':1} (distinct=3 > 2! INVALID)\nShrink L: remove until map.size() <= 2.\nL moves past 'e', then past 'c' (c removed!) -> map={'e':1, 'b':1}\nMax Len = 3", "memoryTip": "Map ka size hi distinct characters ki sankhya batata hai. Jaise hi map.size() > k ho, left ko tab tak aage badhao jab tak koi character count 0 hokar map se remove na ho jaye.", "intuition": "<b>Pattern: Variable Window with Unique Element Bound:</b>\n1. HashMap `freq` maintain karo: `Character -> count`.\n2. `right` pointer badhao aur `freq.put(c, freq.getOrDefault(c, 0) + 1)`.\n3. Jab `freq.size() > k` ho jaye:\n   - `char leftChar = s.charAt(left)`\n   - `freq.put(leftChar, freq.get(leftChar) - 1)`\n   - Agar frequency 0 ho jaye, toh <b>`freq.remove(leftChar)`</b> karna mat bhoolo!\n   - `left++`\n4. `maxLen = max(maxLen, right - left + 1)`.\n\nTotal time $O(N)$ kyunki har character at most twice process hota hai.", "pitfalls": ["k = 0 hone par answer hamesha 0 hota hai.", "Map me frequency 0 hone par remove karna mandatory hai, warna `map.size()` shrink nahi hogi!"], "java": "import java.util.*;\n\nclass Solution {\n    public int lengthOfLongestSubstringKDistinct(String s, int k) {\n        if (s == null || s.length() == 0 || k <= 0) return 0;\n\n        Map<Character, Integer> freq = new HashMap<>();\n        int left = 0;\n        int maxLen = 0;\n\n        for (int right = 0; right < s.length(); right++) {\n            char c = s.charAt(right);\n            freq.put(c, freq.getOrDefault(c, 0) + 1);\n\n            // Jab distinct characters k se zyada ho jayein\n            while (freq.size() > k) {\n                char leftChar = s.charAt(left);\n                freq.put(leftChar, freq.get(leftChar) - 1);\n                if (freq.get(leftChar) == 0) {\n                    freq.remove(leftChar); // Size reduce karne ke liye zaroori hai\n                }\n                left++;\n            }\n\n            maxLen = Math.max(maxLen, right - left + 1);\n        }\n\n        return maxLen;\n    }\n}", "python": "class Solution:\n    def lengthOfLongestSubstringKDistinct(self, s: str, k: int) -> int:\n        if not s or k <= 0:\n            return 0\n\n        freq = {}\n        left = 0\n        max_len = 0\n\n        for right, ch in enumerate(s):\n            freq[ch] = freq.get(ch, 0) + 1\n\n            while len(freq) > k:\n                left_ch = s[left]\n                freq[left_ch] -= 1\n                if freq[left_ch] == 0:\n                    del freq[left_ch]\n                left += 1\n\n            max_len = max(max_len, right - left + 1)\n\n        return max_len"}, {"id": 18, "lc": 159, "premium": true, "title": "Longest Substring with At Most Two Distinct Characters", "difficulty": "Medium", "pattern": "Variable-Size Window (K = 2 Distinct Bound)", "time": "O(N)", "space": "O(1)", "statement": "Given a string <code>s</code>, return the length of the <b>longest substring</b> that contains at most <b>two distinct characters</b>.", "examples": [{"input": "s = \"eceba\"", "output": "3", "explain": "The substring is \"ece\" which its length is 3."}, {"input": "s = \"ccaabbb\"", "output": "5", "explain": "The substring is \"aabbb\" which its length is 5."}], "constraints": ["1 <= s.length <= 10^5", "s consists of English letters."], "statementHi": "String <code>s</code> me sabse lamba continuous tukda (substring) dhoondo jisme jyada se jyada 2 alag-alag characters aa sakte hon.", "memoryFlow": "s = \"c  c  a  a  b  b  b\"\n[c, c] -> 1 distinct <= 2 (len = 2)\n[c, c, a, a] -> 2 distinct ('c', 'a') (len = 4)\nNext comes 'b': [c, c, a, a, b] -> 3 distinct ('c', 'a', 'b') > 2!\nShrink L past all 'c's:\nWindow becomes [a, a, b, b, b] -> 2 distinct ('a', 'b') (len = 5! MAX)", "memoryTip": "Ye LC 340 (At Most K Distinct) ka exact case hai jahan K = 2 hai. LC 904 (Fruit into Baskets) bhi exactly yahi problem hai!", "intuition": "<b>Direct Application of At Most 2 Window:</b>\nYe problem LeetCode 904 (Fruit into Baskets) aur LeetCode 340 (At Most K Distinct with K=2) ki exact duplicate hai.\nMap me character frequencies store karo.\nJaise hi `map.size() > 2` ho, `left` pointer se characters remove karte jao jab tak koi ek character poori tarah map se delete na ho jaye.", "pitfalls": ["Agar string length $\\le 2$ ho, toh answer seedhe `s.length()` hota hai."], "java": "import java.util.*;\n\nclass Solution {\n    public int lengthOfLongestSubstringTwoDistinct(String s) {\n        if (s == null || s.length() == 0) return 0;\n        if (s.length() <= 2) return s.length();\n\n        Map<Character, Integer> map = new HashMap<>();\n        int left = 0;\n        int maxLen = 0;\n\n        for (int right = 0; right < s.length(); right++) {\n            char c = s.charAt(right);\n            map.put(c, map.getOrDefault(c, 0) + 1);\n\n            while (map.size() > 2) {\n                char leftChar = s.charAt(left);\n                map.put(leftChar, map.get(leftChar) - 1);\n                if (map.get(leftChar) == 0) {\n                    map.remove(leftChar);\n                }\n                left++;\n            }\n\n            maxLen = Math.max(maxLen, right - left + 1);\n        }\n\n        return maxLen;\n    }\n}", "python": "class Solution:\n    def lengthOfLongestSubstringTwoDistinct(self, s: str) -> int:\n        if len(s) <= 2:\n            return len(s)\n\n        freq = {}\n        left = 0\n        max_len = 0\n\n        for right, ch in enumerate(s):\n            freq[ch] = freq.get(ch, 0) + 1\n\n            while len(freq) > 2:\n                left_ch = s[left]\n                freq[left_ch] -= 1\n                if freq[left_ch] == 0:\n                    del freq[left_ch]\n                left += 1\n\n            max_len = max(max_len, right - left + 1)\n\n        return max_len"}, {"id": 19, "lc": 76, "premium": false, "title": "Minimum Window Substring", "difficulty": "Hard", "pattern": "Variable-Size Window (Shrink While Valid / Have == Need)", "time": "O(M + N)", "space": "O(1)", "statement": "Given two strings <code>s</code> and <code>t</code> of lengths <code>m</code> and <code>n</code> respectively, return the <b>minimum window substring</b> of <code>s</code> such that every character in <code>t</code> (<b>including duplicates</b>) is included in the window. If there is no such substring, return the empty string <code>\"\"</code>.<br>The testcases will be generated such that the answer is <b>unique</b>.", "examples": [{"input": "s = \"ADOBECODEBANC\", t = \"ABC\"", "output": "\"BANC\"", "explain": "The minimum window substring \"BANC\" includes 'A', 'B', and 'C' from string t."}, {"input": "s = \"a\", t = \"a\"", "output": "\"a\"", "explain": "The entire string s is the minimum window."}, {"input": "s = \"a\", t = \"aa\"", "output": "\"\"", "explain": "Both 'a's from t must be included in the window. Since the largest window of s only has one 'a', return empty string."}], "constraints": ["m == s.length", "n == t.length", "1 <= m, n <= 10^5", "s and t consist of uppercase and lowercase English letters."], "statementHi": "String <code>s</code> me se sabse CHHOTA aisa substring dhoondo jisme string <code>t</code> ke saare characters (unke duplicate counts sahit) cover ho rahe hon. Agar koi aisa window na mile toh empty string <code>\"\"</code> return karo.", "memoryFlow": "s = \"A D O B E C O D E B A N C\", t = \"ABC\"\nRequired: {A:1, B:1, C:1} -> need = 3 distinct chars satisfied\n\nExpand R until all satisfied (have == need):\nWindow: [A D O B E C] -> contains A, B, C! (len = 6)\nNow shrink L from left:\nRemove A -> have becomes 2 < 3 (INVALID, stop shrinking)\n\nKeep expanding R, next time valid window: [B A N C] (len = 4! MINIMUM)\nResult = \"BANC\" ", "memoryTip": "NeetCode Core: Do variables rakho: 'need' (t ke distinct required characters) aur 'have' (window me kitne satisfy ho gaye). Jab have == need, tab answer minimize karo!", "intuition": "<b>NeetCode Classic 'have == need' Technique:</b>\n1. Map `targetFreq` me string `t` ke har character ki required count store karo.\n2. `need = targetFreq.size()` (kitne unique characters ki requirements poori karni hain).\n3. `have = 0` (window me abhi tak kitne unique characters required count tak pahunch chuke hain).\n4. `right` pointer ko aage badhao:\n   - Agar `s[right]` target me hai, toh window frequency increment karo.\n   - Agar `windowFreq[s[right]] == targetFreq[s[right]]`, toh `have++`!\n5. Jab tak <b>`have == need`</b> (window fully valid hai):\n   - Min length aur start index update karo!\n   - Window ko chhota banane ke liye `left` character ko bahar nikalo.\n   - Agar bahar nikalne wala character target ka hissa tha aur uski frequency target se kam ho gayi, toh `have--`!\n   - `left++`.", "pitfalls": ["Java me `Integer` objects compare karte waqt `==` mat lagayein kyunki `> 127` par reference comparison fail hota hai! Use `.equals()` or primitive int.", "Case sensitivity: letters uppercase and lowercase dono hain, so map size 128 use karein."], "java": "import java.util.*;\n\nclass Solution {\n    public String minWindow(String s, String t) {\n        if (s == null || t == null || s.length() < t.length()) return \"\";\n\n        int[] target = new int[128];\n        for (char c : t.toCharArray()) target[c]++;\n\n        int need = 0; // Kitne distinct characters chahiye\n        for (int count : target) {\n            if (count > 0) need++;\n        }\n\n        int[] window = new int[128];\n        int have = 0;\n\n        int minLen = Integer.MAX_VALUE;\n        int startIdx = 0;\n        int left = 0;\n\n        for (int right = 0; right < s.length(); right++) {\n            char rChar = s.charAt(right);\n            window[rChar]++;\n\n            // Agar is character ki requirement exact match ho gayi\n            if (target[rChar] > 0 && window[rChar] == target[rChar]) {\n                have++;\n            }\n\n            // Jab tak window me saare required characters maujood hain\n            while (have == need) {\n                // Minimum window update karo\n                if (right - left + 1 < minLen) {\n                    minLen = right - left + 1;\n                    startIdx = left;\n                }\n\n                // Left pointer shrink karke window chhota karo\n                char lChar = s.charAt(left);\n                window[lChar]--;\n                if (target[lChar] > 0 && window[lChar] < target[lChar]) {\n                    have--; // Requirement toot gayi\n                }\n                left++;\n            }\n        }\n\n        return minLen == Integer.MAX_VALUE ? \"\" : s.substring(startIdx, startIdx + minLen);\n    }\n}", "python": "class Solution:\n    def minWindow(self, s: str, t: str) -> str:\n        if not s or not t or len(s) < len(t):\n            return \"\"\n\n        from collections import Counter\n        target = Counter(t)\n        window = {}\n\n        have, need = 0, len(target)\n        min_len = float('inf')\n        res_idx = (0, 0)\n        left = 0\n\n        for right, ch in enumerate(s):\n            window[ch] = window.get(ch, 0) + 1\n\n            if ch in target and window[ch] == target[ch]:\n                have += 1\n\n            # Window valid hai -> chhota banane ki koshish karo\n            while have == need:\n                if (right - left + 1) < min_len:\n                    min_len = right - left + 1\n                    res_idx = (left, right)\n\n                left_ch = s[left]\n                window[left_ch] -= 1\n                if left_ch in target and window[left_ch] < target[left_ch]:\n                    have -= 1\n                left += 1\n\n        l, r = res_idx\n        return s[l:r + 1] if min_len != float('inf') else \"\" "}, {"id": 20, "lc": 239, "premium": false, "title": "Sliding Window Maximum", "difficulty": "Hard", "pattern": "Monotonic Decreasing Deque (O(N) Sliding Maximum)", "time": "O(N)", "space": "O(K)", "statement": "You are given an array of integers <code>nums</code>, there is a sliding window of size <code>k</code> which is moving from the very left of the array to the very right. You can only see the <code>k</code> numbers in the window. Each time the sliding window moves right by one position.<br>Return the <b>max sliding window</b>.", "examples": [{"input": "nums = [1,3,-1,-3,5,3,6,7], k = 3", "output": "[3,3,5,5,6,7]", "explain": "Window position                Max\\n---------------               -----\\n[1  3  -1] -3  5  3  6  7       3\\n 1 [3  -1  -3] 5  3  6  7       3\\n 1  3 [-1  -3  5] 3  6  7       5\\n 1  3  -1 [-3  5  3] 6  7       5\\n 1  3  -1  -3 [5  3  6] 7       6\\n 1  3  -1  -3  5 [3  6  7]      7"}, {"input": "nums = [1], k = 1", "output": "[1]", "explain": "Only one window possible."}], "constraints": ["1 <= nums.length <= 10^5", "-10^4 <= nums[i] <= 10^4", "1 <= k <= nums.length"], "statementHi": "Array me size <code>k</code> ki window left se right slide ho rahi hai. Har point par window ke andar ka maximum element nikaal kar ek array me return karo. Time complexity O(N) honi chahiye.", "memoryFlow": "nums = [ 1, 3, -1, -3, 5, 3, 6, 7 ], k = 3\nDeque stores indices. Values are strictly decreasing:\ni=0 (1): Deque = [0] (val: 1)\ni=1 (3): 3 > 1 -> pop 0! Deque = [1] (val: 3)\ni=2 (-1): -1 < 3 -> push 2. Deque = [1, 2] (vals: 3, -1)\n          Window 1 max = nums[dq.peekFirst()] = 3\ni=3 (-3): -3 < -1 -> push 3. Deque = [1, 2, 3] (vals: 3, -1, -3)\n          Window 2 max = 3\ni=4 (5): 5 > -3, -1, 3 -> pop all! Deque = [4] (val: 5)\n          Window 3 max = 5\n...\nHar step O(1) amortized!", "memoryTip": "Monotonic Deque Rule: Naya element nums[i] aane par peeche se saare chhote elements ko pop kar do (kyunki wo kabhi maximum nahi ban sakte!).", "intuition": "<b>Why Heap is O(N log K) and Deque is O(N)?</b>\nMax-Heap se solve karne par remove operation $O(k)$ ya $O(\\log k)$ leta hai, total $O(N \\log K)$.\n<b>Monotonic Deque O(N) Intuition:</b>\n- Deque me hum elements ke <b>indices</b> store karte hain.\n- Deque ke andar values hamesha <b>strictly decreasing</b> order me rehti hain.\n- Isliye Deque ka **front element (`peekFirst`) hamesha current window ka MAX** hota hai!\n1. Window se out-of-bounds hua index (`dq.peekFirst() <= i - k`) front se hata do.\n2. Back se saare indices hatao jinki value $\\le nums[i]$ ho (`nums[dq.peekLast()] <= nums[i]`).\n3. Index `i` ko Deque me add karo.\n4. Jab `i >= k - 1` ho, tab `result[ri++] = nums[dq.peekFirst()]`.", "pitfalls": ["Deque me values store karne ke bajaye **indices** store karein taaki out-of-window check `dq.peekFirst() <= i - k` easily ho sake.", "ArrayDeque Java me `LinkedList` se 2-3x fast hota hai."], "java": "import java.util.*;\n\nclass Solution {\n    public int[] maxSlidingWindow(int[] nums, int k) {\n        int n = nums.length;\n        if (n == 0 || k == 0) return new int[0];\n\n        int[] result = new int[n - k + 1];\n        int ri = 0;\n\n        // Monotonic Deque: indices store karta hai, decreasing order me\n        Deque<Integer> dq = new ArrayDeque<>();\n\n        for (int i = 0; i < n; i++) {\n            // 1. Jo index window se bahar nikal gaya use front se hatao\n            if (!dq.isEmpty() && dq.peekFirst() <= i - k) {\n                dq.pollFirst();\n            }\n\n            // 2. Chhoti values ko back se pop karo (nums[i] unse bada aur naya hai)\n            while (!dq.isEmpty() && nums[dq.peekLast()] <= nums[i]) {\n                dq.pollLast();\n            }\n\n            // 3. Current element ka index add karo\n            dq.offerLast(i);\n\n            // 4. Pehli k-size window banne ke baad max record karo\n            if (i >= k - 1) {\n                result[ri++] = nums[dq.peekFirst()];\n            }\n        }\n\n        return result;\n    }\n}", "python": "from collections import deque\n\nclass Solution:\n    def maxSlidingWindow(self, nums: list[int], k: int) -> list[int]:\n        if not nums or k == 0:\n            return []\n\n        dq = deque()  # Monotonically decreasing indexes\n        res = []\n\n        for i, val in enumerate(nums):\n            # 1. Out of window elements ko front se nikalo\n            if dq and dq[0] <= i - k:\n                dq.popleft()\n\n            # 2. Back se chhote elements ko hatao\n            while dq and nums[dq[-1]] <= val:\n                dq.pop()\n\n            # 3. Current index push karo\n            dq.append(i)\n\n            # 4. Window ready hone par front element result me append karo\n            if i >= k - 1:\n                res.append(nums[dq[0]])\n\n        return res"}];
+
+    function escapeHtml(str) {
+      if (typeof str !== 'string') return '';
+      return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+
+    // ==========================================================
+    // SYNTAX HIGHLIGHTER (single-pass tokenizer)
+    // ==========================================================
+    const JAVA_KEYWORDS = new Set([
+      'class','public','private','protected','static','final','void','int','long','double','boolean','char',
+      'new','return','if','else','while','for','null','true','false','this','break','continue','import','package','extends','implements'
+    ]);
+    const PY_KEYWORDS = new Set([
+      'class','def','return','if','else','elif','while','for','in','not','and','or','is','None','True','False',
+      'nonlocal','global','import','from','as','self','pass','break','continue','lambda'
+    ]);
+    const PY_TYPES = new Set(['int','bool','float','str','list','dict','set','tuple']);
+
+    const JAVA_TOKEN_RE = /(\/\/[^\n]*)|("(?:[^"\\\n]|\\.)*")|('(?:[^'\\\n]|\\.)*')|(\b\d+(?:\.\d+)?\b)|([A-Za-z_]\w*)/g;
+    const PY_TOKEN_RE   = /(#[^\n]*)|("(?:[^"\\\n]|\\.)*")|('(?:[^'\\\n]|\\.)*')|(\b\d+(?:\.\d+)?\b)|([A-Za-z_]\w*)/g;
+
+    function highlightCode(code, lang) {
+      const isJava = lang === 'java';
+      const re = new RegExp((isJava ? JAVA_TOKEN_RE : PY_TOKEN_RE).source, 'g');
+      const keywords = isJava ? JAVA_KEYWORDS : PY_KEYWORDS;
+      const span = (cls, text) => `<span class="token ${cls}">${escapeHtml(text)}</span>`;
+
+      let out = '';
+      let last = 0;
+      let m;
+      while ((m = re.exec(code)) !== null) {
+        out += escapeHtml(code.slice(last, m.index));
+        const text = m[0];
+        if (m[1]) out += span('comment', text);
+        else if (m[2] || m[3]) out += span('string', text);
+        else if (m[4]) out += span('number', text);
+        else {
+          const nextChar = code[re.lastIndex];
+          if (keywords.has(text)) out += span('keyword', text);
+          else if (!isJava && PY_TYPES.has(text)) out += span('class-name', text);
+          else if (/^[A-Z]\w*[a-z]\w*$/.test(text)) out += span('class-name', text);
+          else if (nextChar === '(') out += span('function', text);
+          else out += escapeHtml(text);
+        }
+        last = re.lastIndex;
+      }
+      out += escapeHtml(code.slice(last));
+      return out;
+    }
+
+    // ==========================================================
+    // SIDEBAR RENDERING & SEARCH
+    // ==========================================================
+    function renderSidebar() {
+      const listEl = document.getElementById('sidebarList');
+      const filterText = document.getElementById('searchInput').value;
+      const qLower = filterText.toLowerCase().trim();
+
+      listEl.innerHTML = '';
+      questions.forEach(q => {
+        const haystack = (q.title + ' ' + q.pattern + ' ' + q.lc + ' ' + q.id).toLowerCase();
+        if (!filterText || haystack.includes(qLower)) {
+          const item = document.createElement('div');
+          item.className = 'q-item' + (currentView === q.id ? ' active' : '');
+          item.onclick = () => showQuestion(q.id);
+          item.innerHTML = `
+            <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+              #${q.id}. ${q.title}
+            </span>
+            <span class="badge ${q.difficulty}">${q.difficulty}</span>
+          `;
+          listEl.appendChild(item);
+        }
+      });
+    }
+
+    function filterSidebar() {
+      renderSidebar();
+    }
+
+    function setLanguage(lang) {
+      currentLang = lang;
+      document.getElementById('global-java').className = 'lang-btn' + (lang === 'java' ? ' active' : '');
+      document.getElementById('global-python').className = 'lang-btn' + (lang === 'python' ? ' active' : '');
+
+      if (currentView === 'home') {
+        showHome(true);
+      } else if (currentView === 'all') {
+        showAllQuestions(currentFilter, true);
+      } else {
+        showQuestion(currentView, true);
+      }
+    }
+
+    function updateNavButtons() {
+      document.getElementById('btn-home').className = 'nav-btn' + (currentView === 'home' ? ' active' : '');
+      document.getElementById('btn-all').className = 'nav-btn' + (currentView === 'all' ? ' active' : '');
+      renderSidebar();
+    }
+
+    // ==========================================================
+    // HOME PAGE: TEMPLATES + CHEATSHEET + RULES
+    // ==========================================================
+    function showHome(keepScroll = false) {
+      currentView = 'home';
+      updateNavButtons();
+      document.getElementById('breadcrumb').innerText = 'Home / Sliding Window Blueprint';
+
+      const langName = currentLang === 'java' ? 'Java' : 'Python';
+
+      const tocHtml = templates.map((t, i) =>
+        `<a onclick="document.getElementById('tmpl-${i}').scrollIntoView({behavior:'smooth'})">${t.title}</a>`
+      ).join('');
+
+      const templateCards = templates.map((t, i) => {
+        const colored = highlightCode(t[currentLang], currentLang);
+        return `
+          <div class="section-box" id="tmpl-${i}">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; flex-wrap:wrap; gap:8px;">
+              <h3 style="margin-bottom:0;">${t.title}</h3>
+              <button class="copy-btn" onclick="copyTemplate(${i}, this)">📋 Copy ${langName}</button>
+            </div>
+            <p style="color: var(--text-muted); font-size: 0.92rem; margin-bottom: 12px;">${t.desc}</p>
+            <div class="code-container" style="margin-bottom: 0;">
+              <div class="code-header">
+                <span style="font-size:0.82rem; color:var(--text-muted);">${langName} Template</span>
+                <button class="copy-btn" onclick="copyTemplate(${i}, this)">📋 Copy</button>
+              </div>
+              <pre><code>${colored}</code></pre>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      const qLinks = ids => ids.map(id => {{
+        const q = questions.find(x => x.id === id);
+        return `<a onclick="showQuestion(${id})" style="color:var(--accent); cursor:pointer; text-decoration:underline; font-weight:600;">#${id} ${q.title}</a>`;
+      }}).join(', ');
+
+      const patternRows = [
+        ['Fixed size <code>k</code> window sum / average', 'Add nums[i], subtract nums[i - k]', [2, 12, 15]],
+        ['Duplicate / elements within distance <code>k</code>', 'HashSet of size &le; k', [3]],
+        ['Fixed window size 3 distinct check', 'Triple comparison <code>a != b && b != c && a != c</code>', [4]],
+        ['Longest substring without repeating characters', 'Variable window + lastSeen Index Map / visited set', [5]],
+        ['Longest repeating character replacement', 'Variable window: <code>(Window - maxFreq) &le; k</code>', [6]],
+        ['Permutation / Anagrams in string', 'Fixed window <code>p.length()</code> + 26-char frequency match', [7, 11]],
+        ['Flip at most K zeros / Max consecutive ones', 'Variable window: count of zeros &le; k', [8]],
+        ['At most 2 (or K) distinct elements / fruit baskets', 'Variable window: shrink while <code>map.size() > K</code>', [9, 17, 18]],
+        ['Shortest / minimum subarray with sum &ge; target', 'Variable window: shrink while valid (sum &ge; target)', [10]],
+        ['Max points from cards (ends selection)', 'Inverse window: minimize middle subarray sum of size (N - K)', [13]],
+        ['Transform substring within budget / maxCost', 'Variable window: shrink while cost > maxCost', [14]],
+        ['Count valid subarrays (e.g. product < K)', 'Valid window: <code>count += (right - left + 1)</code>', [16]],
+        ['Minimum window substring containing all chars of T', 'Hard window: <code>have == need</code> shrink while valid', [19]],
+        ['Sliding window maximum in O(N)', 'Monotonic Decreasing Deque (store indices)', [20]],
+        ['Stock Buy / Sell Window', 'Shift Left pointer when cheaper price found', [1]]
+      ].map(r => `<tr><td>${r[0]}</td><td>${r[1]}</td><td>${qLinks(r[2])}</td></tr>`).join('');
+
+      document.getElementById('viewContainer').innerHTML = `
+        <div class="hero-card">
+          <h1>🪟 Sliding Window Master Vault — NeetCode 20 Edition</h1>
+          <p style="color: var(--text-muted); font-size: 1.02rem;">
+            Yahan tumhe Sliding Window ke <b>saare foundational templates</b> (Fixed window, Variable window, Anagram match, Deque max, Subarray counting formula) milenge,
+            aur uske baad <b>20 NeetCode/LeetCode curated questions</b> (Easy, Medium, Hard) — har ek me <b>English problem statement</b>, <b>Hinglish explanation</b>,
+            pointer flow map, step-by-step intuition, common pitfalls, aur <b>detailed comments wala Java + Python code</b>.
+          </p>
+          <div style="margin-top: 18px;">
+            <button class="btn-secondary" style="border-color: var(--accent); color: var(--accent);" onclick="showAllQuestions()">
+              🚀 Open All 20 Questions Directory →
+            </button>
+          </div>
+        </div>
+
+        <div class="grid-3">
+          <div class="rule-card">
+            <h3>1. Fixed vs Variable Window</h3>
+            <p style="font-size: 0.92rem; color: var(--text-muted);">
+              <b>Fixed Window (size K):</b> Window ka size pehle se fix hai. Pehle $K$ elements lo, phir har kadam par $nums[i]$ add karo aur $nums[i - k]$ bahar nikalo.<br>
+              <b>Variable Window:</b> $R$ pointer aage badhao, condition break hone par $L$ badhakar window valid banao.
+            </p>
+          </div>
+          <div class="rule-card">
+            <h3>2. Subarray Counting Magic</h3>
+            <p style="font-size: 0.92rem; color: var(--text-muted);">
+              Jab window <code>[L .. R]</code> valid ho, toh index $R$ par end hone wale exact <b>(R - L + 1)</b> valid subarrays bante hain! Har step par <code>count += (R - L + 1)</code> jodte chalo.
+            </p>
+          </div>
+          <div class="rule-card">
+            <h3>3. Longest vs Shortest Logic</h3>
+            <p style="font-size: 0.92rem; color: var(--text-muted);">
+              <b>Longest Subarray:</b> $L$ ko tab aage badhao jab window <b>INVALID</b> ho (valid banana hai).<br>
+              <b>Shortest Subarray:</b> $L$ ko tab aage badhao jab window <b>VALID</b> ho (chhota banana hai).
+            </p>
+          </div>
+          <div class="rule-card">
+            <h3>4. Inversion / Complement Trick</h3>
+            <p style="font-size: 0.92rem; color: var(--text-muted);">
+              Agar dono ends (corners) se $K$ elements choose karke sum maximize karna ho, toh beech ke $(N - K)$ elements ka <b>minimum contiguous sum</b> dhoondo!
+            </p>
+          </div>
+          <div class="rule-card">
+            <h3>5. Frequency Matching O(1)</h3>
+            <p style="font-size: 0.92rem; color: var(--text-muted);">
+              Strings ke anagram / permutation problems me <code>int[26]</code> ya <code>int[128]</code> frequency array use karo. Window slide karte waqt sirf do values change hoti hain!
+            </p>
+          </div>
+          <div class="rule-card">
+            <h3>6. Monotonic Deque O(N) Extreme</h3>
+            <p style="font-size: 0.92rem; color: var(--text-muted);">
+              Sliding window maximum/minimum ke liye Heap $O(N \log K)$ deta hai, par <b>Monotonic Deque</b> se har element at most once push aur pop hota hai -> strictly $O(N)$ time!
+            </p>
+          </div>
+        </div>
+
+        <div class="section-box">
+          <h2 style="color: var(--accent); margin-bottom: 12px;">🗺️ Pattern Cheatsheet Table</h2>
+          <p style="color: var(--text-muted); font-size: 0.92rem; margin-bottom: 16px;">
+            Exam me question padhte hi identify karo ki kaunsa Sliding Window pattern lagega:
+          </p>
+          <div class="table-wrap">
+            <table class="cheat-table">
+              <thead>
+                <tr>
+                  <th>Agar Sawaal Me Ye Requirement Ho</th>
+                  <th>Toh Ye Window Strategy Lagao</th>
+                  <th>Direct Question Links</th>
+                </tr>
+              </thead>
+              <tbody>${patternRows}</tbody>
+            </table>
+          </div>
+        </div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; margin: 28px 0 16px; flex-wrap:wrap; gap:10px;">
+          <h2 style="color: var(--accent);">🛠️ Foundational Sliding Window Templates (${langName})</h2>
+          <button class="copy-btn" onclick="copyAllTemplates(this)">📋 Copy All Templates</button>
+        </div>
+        <p style="color: var(--text-muted); font-size: 0.92rem; margin-bottom: 16px;">
+          Jump to template:
+        </p>
+        <div class="toc">${tocHtml}</div>
+
+        ${templateCards}
+      `;
+
+      if (!keepScroll) window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // ==========================================================
+    // ALL QUESTIONS DIRECTORY PAGE
+    // ==========================================================
+    function showAllQuestions(filterDiff = 'All', keepScroll = false) {
+      currentView = 'all';
+      currentFilter = filterDiff;
+      updateNavButtons();
+      document.getElementById('breadcrumb').innerText = 'Questions / All Directory';
+
+      const filtered = questions.filter(q => filterDiff === 'All' || q.difficulty === filterDiff);
+      const count = d => questions.filter(q => q.difficulty === d).length;
+
+      const cardsHtml = filtered.map(q => `
+        <div class="q-card" onclick="showQuestion(${q.id})">
+          <div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+              <span style="font-size:0.82rem; color:var(--text-muted);">#${q.id} · LC #${q.lc}</span>
+              <span class="badge ${q.difficulty}">${q.difficulty}</span>
+            </div>
+            <div class="q-card-title">${escapeHtml(q.title)}</div>
+          </div>
+          <div class="q-card-pattern">
+            ${q.premium ? '<span style="color:#fbbf24; font-weight:600;">🔒 Premium</span> · ' : ''}
+            🧩 ${escapeHtml(q.pattern)}
+          </div>
+        </div>
+      `).join('');
+
+      const btnStyle = (name, color) => filterDiff === name ? `border-color:${color};color:${color};` : '';
+
+      document.getElementById('viewContainer').innerHTML = `
+        <h1 style="margin-bottom: 8px; color: var(--accent);">📚 All 20 Sliding Window Questions</h1>
+        <p style="color: var(--text-muted); margin-bottom: 20px;">
+          Kisi bhi question par click karein — English statement, Hinglish version, Pointer Flow Map, Intuition aur detailed-comment wala Java + Python code mil jayega. (🔒 = LeetCode Premium)
+        </p>
+
+        <div class="filter-row">
+          <button class="btn-secondary" style="${btnStyle('All', 'var(--accent)')}" onclick="showAllQuestions('All')">All (${questions.length})</button>
+          <button class="btn-secondary" style="${btnStyle('Easy', 'var(--easy)')}" onclick="showAllQuestions('Easy')">Easy (${count('Easy')})</button>
+          <button class="btn-secondary" style="${btnStyle('Medium', 'var(--medium)')}" onclick="showAllQuestions('Medium')">Medium (${count('Medium')})</button>
+          <button class="btn-secondary" style="${btnStyle('Hard', 'var(--hard)')}" onclick="showAllQuestions('Hard')">Hard (${count('Hard')})</button>
+        </div>
+
+        <div class="q-grid">${cardsHtml}</div>
+      `;
+      if (!keepScroll) window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // ==========================================================
+    // SINGLE QUESTION PAGE
+    // ==========================================================
+    function renderExamples(q) {
+      return q.examples.map((ex, i) => `
+        <div class="example-box"><span class="lbl">Example ${i + 1}:</span>
+<span class="lbl">Input:</span>  ${escapeHtml(ex.input)}
+<span class="lbl">Output:</span> ${escapeHtml(ex.output)}${ex.explain ? `
+<span class="lbl">Explanation:</span> <span class="explain">${escapeHtml(ex.explain)}</span>` : ''}</div>
+      `).join('');
+    }
+
+    function showQuestion(id, keepScroll = false) {
+      currentView = id;
+      updateNavButtons();
+      const q = questions.find(item => item.id === id);
+      document.getElementById('breadcrumb').innerText = `Questions / #${q.id} ${q.title}`;
+
+      const rawCode = currentLang === 'java' ? q.java : q.python;
+      const coloredCode = highlightCode(rawCode, currentLang);
+
+      document.getElementById('viewContainer').innerHTML = `
+        <div class="problem-header">
+          <button class="btn-secondary" style="margin-bottom: 16px; padding: 6px 12px; font-size: 0.85rem;" onclick="showAllQuestions()">
+            ← Back to All Questions
+          </button>
+          <div class="problem-title-row">
+            <h1>#${q.id}. ${escapeHtml(q.title)}</h1>
+            <span class="badge ${q.difficulty}" style="font-size: 0.85rem; padding: 4px 12px;">${q.difficulty}</span>
+          </div>
+          <div class="meta-pills">
+            <span class="pill">🔢 <b>LeetCode:</b> #${q.lc}</span>
+            ${q.premium ? '<span class="pill premium">🔒 LeetCode Premium</span>' : ''}
+            <span class="pill">🧩 <b>Pattern:</b> ${q.pattern}</span>
+            <span class="pill">⏱️ <b>Time:</b> ${q.time}</span>
+            <span class="pill">💾 <b>Space:</b> ${q.space}</span>
+          </div>
+        </div>
+
+        <div class="section-box">
+          <h3>📌 Problem Statement (English)</h3>
+          <div style="margin-bottom: 8px;">${q.statement}</div>
+          <h4>Examples</h4>
+          ${renderExamples(q)}
+          <h4>Constraints</h4>
+          <ul class="constraints">${q.constraints.map(c => `<li>${escapeHtml(c)}</li>`).join('')}</ul>
+        </div>
+
+        <div class="hinglish-box">
+          <h3>🇮🇳 Same Question in Hinglish (Samajhne ke liye)</h3>
+          <p>${q.statementHi}</p>
+        </div>
+
+        <div class="memory-box">
+          <h3>🧠 Pointer Movement Flow & Exam Trigger</h3>
+          <div class="flow-diagram">${escapeHtml(q.memoryFlow)}</div>
+          <p style="color: #c7d2fe; font-weight: 600;">
+            🔑 Exam Trigger: <span style="font-weight: 400; color: #f8fafc;">${q.memoryTip}</span>
+          </p>
+        </div>
+
+        <div class="section-box">
+          <h3>💡 Core Logic & Step-by-Step Intuition</h3>
+          <p style="white-space: pre-line;">${q.intuition}</p>
+        </div>
+
+        <div class="pitfall-box">
+          <h3>⚠️ Common Mistakes / Edge Cases</h3>
+          <ul>${q.pitfalls.map(p => `<li>${p}</li>`).join('')}</ul>
+        </div>
+
+        <div class="code-container">
+          <div class="code-header">
+            <div style="display:flex; gap:8px;">
+              <button class="lang-btn ${currentLang === 'java' ? 'active' : ''}" onclick="setLanguage('java')">☕ Java Solution</button>
+              <button class="lang-btn ${currentLang === 'python' ? 'active' : ''}" onclick="setLanguage('python')">🐍 Python Solution</button>
+            </div>
+            <button class="copy-btn" onclick="copyCurrentQuestionCode(${q.id}, this)">📋 Copy Code</button>
+          </div>
+          <pre><code>${coloredCode}</code></pre>
+        </div>
+
+        <div class="nav-footer">
+          ${q.id > 1 ? `<button class="btn-secondary" onclick="showQuestion(${q.id - 1})">← Prev: #${q.id - 1} ${escapeHtml(questions[q.id - 2].title)}</button>` : `<div></div>`}
+          ${q.id < questions.length ? `<button class="btn-secondary" onclick="showQuestion(${q.id + 1})">Next: #${q.id + 1} ${escapeHtml(questions[q.id].title)} →</button>` : `<div></div>`}
+        </div>
+      `;
+      if (!keepScroll) window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // ==========================================================
+    // COPY HELPERS
+    // ==========================================================
+    function copyCurrentQuestionCode(id, btn) {
+      const q = questions.find(item => item.id === id);
+      copyText(currentLang === 'java' ? q.java : q.python, btn);
+    }
+
+    function copyTemplate(index, btn) {
+      copyText(templates[index][currentLang], btn);
+    }
+
+    function copyAllTemplates(btn) {
+      const sep = currentLang === 'java' ? '\n\n' : '\n\n\n';
+      copyText(templates.map(t => t[currentLang]).join(sep), btn);
+    }
+
+    function copyText(text, btn) {
+      const done = () => {
+        const old = btn.innerText;
+        btn.innerText = '✅ Copied!';
+        setTimeout(() => { btn.innerText = old; }, 1500);
+      };
+      const fallback = () => {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand('copy'); done(); } catch (e) { btn.innerText = '❌ Copy failed'; }
+        document.body.removeChild(ta);
+      };
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(text).then(done).catch(fallback);
+      } else {
+        fallback();
+      }
+    }
+
+    // ==========================================================
+    // INITIALIZATION
+    // ==========================================================
+    renderSidebar();
+    showHome();
+  </script>
+</body>
+</html>
